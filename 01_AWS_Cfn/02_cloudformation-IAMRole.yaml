@@ -1,0 +1,28 @@
+---
+  AWSTemplateFormatVersion: '2010-09-09'
+  Description: 'IAM role for EC2'
+  
+  Resources:
+    EC2IAMRole:
+      Type: "AWS::IAM::Role"
+      Properties:
+        AssumeRolePolicyDocument:
+          Statement: 
+            -
+              Effect: "Allow"
+              Principal:
+                Service:
+                  - "ec2.amazonaws.com"
+              Action:
+                - "sts:AssumeRole"
+        Path: "/"
+        RoleName: 'EC2IAMRole'
+        ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
+
+  Outputs:
+    EC2IAMRole:
+      Value: !Ref EC2IAMRole
+      Export:
+        Name: EC2IAMRole

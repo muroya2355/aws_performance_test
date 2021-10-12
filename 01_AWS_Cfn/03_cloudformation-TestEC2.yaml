@@ -1,0 +1,72 @@
+---
+  AWSTemplateFormatVersion: '2010-09-09'
+  Description: 'TestEC2/SG/Key'
+  
+  Parameters:
+    TestEC2PrivateIP:
+      Type: String
+      Default: 192.168.10.11
+    EC2ImageID:
+      Type: AWS::SSM::Parameter::Value<String>
+      Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+    EC2InstanceType:
+      Type: String
+      Default: t3.micro
+    KeyName:
+      Type: "AWS::EC2::KeyPair::KeyName"
+      Default: "key-performance-test"
+    FromIPSegment:
+      Type: String
+      Default: XXX.XXX.XXX.XXX/32
+
+  Resources:
+    TestEC2SG:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        GroupName: sg_test1
+        GroupDescription: "SG for TestEC2"
+        VpcId: !ImportValue VPC
+        SecurityGroupIngress:
+          - IpProtocol: tcp
+            FromPort: 80
+            ToPort: 80
+            CidrIp: !Ref FromIPSegment
+
+    TestEC2IAMInstanceProfile:
+      Type: "AWS::IAM::InstanceProfile"
+      Properties:
+        Path: "/"
+        Roles:
+        - !ImportValue EC2IAMRole
+
+    TestEC2Instance:
+      Type: AWS::EC2::Instance
+      Properties: 
+        ImageId: !Ref EC2ImageID
+        KeyName: !Ref KeyName
+        InstanceType: !Ref EC2InstanceType
+        NetworkInterfaces:
+          - AssociatePublicIpAddress: "true"
+            DeviceIndex: "0"
+            SubnetId: !Select [0, !Split [",", !ImportValue PublicSubnetIDs]]
+            PrivateIpAddress: !Ref TestEC2PrivateIP
+            GroupSet:
+              - !Ref TestEC2SG
+        IamInstanceProfile: !Ref TestEC2IAMInstanceProfile
+        UserData:
+          Fn::Base64: |
+            #!/bin/bash
+            sudo amazon-linux-extras enable ansible2
+            sudo yum install -y ansible
+            sudo yum install python3
+            ansible-galaxy collection install amazon.aws
+            pip3 install boto3 botocore
+        Tags:
+            - Key: Name
+              Value: test1
+
+  Outputs:
+    TestEC2SG:
+      Value: !Ref TestEC2SG
+      Export:
+        Name: TestEC2SG
