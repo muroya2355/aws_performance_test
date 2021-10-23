@@ -11,13 +11,13 @@
       Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
     EC2InstanceType:
       Type: String
-      Default: t3.micro
+      Default: t3.nano
     KeyName:
       Type: "AWS::EC2::KeyPair::KeyName"
       Default: "key-performance-test"
     FromIPSegment:
       Type: String
-      Default: XXX.XXX.XXX.XXX/32
+      Default: 126.163.171.34/32
 
   Resources:
     TestEC2SG:
@@ -25,11 +25,11 @@
       Properties:
         GroupName: sg_test1
         GroupDescription: "SG for TestEC2"
-        VpcId: !ImportValue VPC
+        VpcId: !ImportValue VPCID
         SecurityGroupIngress:
           - IpProtocol: tcp
-            FromPort: 80
-            ToPort: 80
+            FromPort: 22
+            ToPort: 22
             CidrIp: !Ref FromIPSegment
 
     TestEC2IAMInstanceProfile:
@@ -57,8 +57,8 @@
           Fn::Base64: |
             #!/bin/bash
             sudo amazon-linux-extras enable ansible2
-            sudo yum install -y ansible
             sudo yum install python3
+            sudo yum install -y ansible
             ansible-galaxy collection install amazon.aws
             pip3 install boto3 botocore
         Tags:

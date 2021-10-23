@@ -11,10 +11,10 @@
       Default: "key-performance-test"
     EC2InstanceType:
       Type: String
-      Default: t3.micro
+      Default: t3.nano
     FromIPSegment:
       Type: String
-      Default: XXX.XXX.XXX.XXX/32
+      Default: 126.163.171.34/32
 
   Resources:
   # ---------------------------------------------------------------
@@ -89,6 +89,9 @@
         Tags:
           - Key: Name
             Value: webap
+            PropagateAtLaunch: true
+          - Key: Application
+            Value: tour-reservation
             PropagateAtLaunch: true
 
   # ---------------------------------------------------------------
