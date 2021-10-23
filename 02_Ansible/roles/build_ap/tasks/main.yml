@@ -27,3 +27,8 @@
     src: ../files/context.xml
     dest: /home/ec2-user/terasoluna-tourreservation/terasoluna-tourreservation-env/configs/tomcat9-postgresql/ContainerConfigXML/context.xml
     mode: 0644
+
+- name: DB初期化
+  shell: mvn -f /home/ec2-user/terasoluna-tourreservation/terasoluna-tourreservation-initdb/pom.xml
+  register: initdb_status
+  failed_when: initdb_status.rc != '0'
