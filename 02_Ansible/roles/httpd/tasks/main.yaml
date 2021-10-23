@@ -15,6 +15,13 @@
     dest: /etc/httpd/conf/httpd.conf
     mode: 0644
 
+# ヘルスチェックファイルの配置
+- name: index.htmlの配置
+  copy:
+    src: ../files/index.html
+    dest: /var/www/html/index.html
+    mode: 0644
+
 # ファイアウォール設定
 #- name: firewalldでHTTPを許可
 #  firewalld: permanent=True service=http state=enabled immediate=true
