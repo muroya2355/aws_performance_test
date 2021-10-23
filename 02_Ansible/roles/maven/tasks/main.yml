@@ -33,10 +33,10 @@
 # 環境変数の設定
 - name: .bash_profileに追記
   blockinfile:
-    dest: /home/ec2-user/.bash_profile
+    dest: /root/.bash_profile
     insertafter: EOF
     content: |
       export PATH=$PATH:/opt/maven/bin
 
 - name: .bash_profileの反映
-  shell: source /home/ec2-user/.bash_profile
+  shell: source /root/.bash_profile

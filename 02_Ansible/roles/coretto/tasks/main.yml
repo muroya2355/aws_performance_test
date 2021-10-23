@@ -6,8 +6,8 @@
 
 
 # javaがインストールされていない場合, Javaをインストール
-- name: Amazon Corretto 11のインストール
-  yum: name=java-11-amazon-corretto state=present
+- name: OpenJDK11のインストール
+  yum: name=java-11-openjdk-devel state=present
   when:
     - not ansible_check_mode
     - java_which.rc == 1
@@ -16,10 +16,11 @@
 # 環境変数の設定
 - name: .bash_profileに追記
   blockinfile:
-    dest: /home/ec2-user/.bash_profile
+    dest: /root/.bash_profile
     insertafter: EOF
     content: |
-      JAVA_HOME=/usr/lib/jvm/java-11-amazon-corretto.x86_64
+      JAVA_HOME=/usr/lib/jvm/java-11-openjdk
+      export PATH=$PATH:/opt/maven/bin
 
 - name: .bash_profileの反映
-  shell: source /home/ec2-user/.bash_profile
+  shell: source /root/.bash_profile
