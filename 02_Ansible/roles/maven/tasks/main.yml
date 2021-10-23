@@ -28,3 +28,15 @@
 - name: リンクの作成（/opt/maven -> /opt/apache-maven-3.8.3）
   file: src=/opt/apache-maven-3.8.3 path=/opt/maven state=link
   when: not ansible_check_mode
+
+
+# 環境変数の設定
+- name: .bash_profileに追記
+  blockinfile:
+    dest: /home/ec2-user/.bash_profile
+    insertafter: EOF
+    content: |
+      export PATH=$PATH:/opt/maven/bin
+
+- name: .bash_profileの反映
+  shell: source /home/ec2-user/.bash_profile

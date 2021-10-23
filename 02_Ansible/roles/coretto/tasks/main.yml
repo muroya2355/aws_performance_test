@@ -16,7 +16,7 @@
 # 環境変数の設定
 - name: .bash_profileに追記
   blockinfile:
-    dest: /root/.bash_profile
+    dest: /home/ec2-user/.bash_profile
     insertafter: EOF
     content: |
       JAVA_HOME=/usr/lib/jvm/java-11-amazon-corretto.x86_64
