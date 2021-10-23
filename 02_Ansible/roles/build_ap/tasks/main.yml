@@ -1,25 +1,29 @@
 # ソフトウェアダウンロード、配置
 - name: ソースコードがあるか確認
-  stat: path=/home/ec2-user/terasoluna-tourreservation
-  register: sourcecode_dir
+  stat: path=/home/ec2-user/terasoluna-tourreservation/README.md
+  register: sourcecode_files
 
 - name: ソースコードを取得
   ansible.builtin.git:
     repo: https://github.com/terasolunaorg/terasoluna-tourreservation.git
     dest: /home/ec2-user/terasoluna-tourreservation
-  when: not sourcecode_dir.stat.exists
+  when: not sourcecode_files.stat.exists
 
 # 設定ファイル配置
-#- name: DB接続ファイルの配置
-#  copy:
-#    src: ../files/terasoluna-tourreservation-infra.properties
-#    dest: /etc/systemd/system/tomcat.service
-#    mode: 0755
+- name: DB接続ファイルの配置
+  copy:
+    src: ../files/terasoluna-tourreservation-infra.properties
+    dest: /home/ec2-user/terasoluna-tourreservation/terasoluna-tourreservation-env/src/main/resources/META-INF/spring/terasoluna-tourreservation-infra.properties
+    mode: 0644
 
-#- name: server.xmlの配置
-#  copy:
-#    src: ../files/server.xml
-#    dest: /opt/tomcat/conf/server.xml
-#    owner: tomcat
-#    group: tomcat
-#    mode: 0644
+- name: DB初期化用ファイルの配置
+  copy:
+    src: ../files/pom.xml
+    dest: /home/ec2-user/terasoluna-tourreservation/terasoluna-tourreservation-initdb/pom.xml
+    mode: 0644
+
+- name: coutext.xml の配置
+  copy:
+    src: ../files/context.xml
+    dest: /home/ec2-user/terasoluna-tourreservation/terasoluna-tourreservation-env/configs/tomcat9-postgresql/ContainerConfigXML/context.xml
+    mode: 0644
