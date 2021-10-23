@@ -1,0 +1,9 @@
+---
+- name: deploy testservers
+  hosts: localhost
+
+  become: yes
+
+  roles:
+    - coretto
+    - maven
