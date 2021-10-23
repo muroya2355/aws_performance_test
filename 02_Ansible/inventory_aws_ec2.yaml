@@ -20,4 +20,4 @@ compose:
 cache: yes
 cache_plugin: jsonfile
 cache_timeout: 3600
-cache_connection: $HOME/ansible/aws_inventory
+cache_connection: $HOME/aws_performance_test/aws_inventory

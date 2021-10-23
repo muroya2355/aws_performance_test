@@ -1,0 +1,25 @@
+# ソフトウェアダウンロード、配置
+- name: ソースコードがあるか確認
+  stat: path=/home/ec2-user/terasoluna-tourreservation
+  register: sourcecode_dir
+
+- name: ソースコードを取得
+  ansible.builtin.git:
+  repo: https://github.com/terasolunaorg/terasoluna-tourreservation.git
+  dest: /home/ec2-user/
+  when: not sourcecode_dir.stat.exists
+
+# 設定ファイル配置
+#- name: serviceファイルの配置
+#  copy:
+#    src: ../files/tomcat.service
+#    dest: /etc/systemd/system/tomcat.service
+#    mode: 0755
+#
+#- name: server.xmlの配置
+#  copy:
+#    src: ../files/server.xml
+#    dest: /opt/tomcat/conf/server.xml
+#    owner: tomcat
+#    group: tomcat
+#    mode: 0644
