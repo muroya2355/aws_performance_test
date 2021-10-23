@@ -39,6 +39,6 @@
   failed_when: clean_status.rc != 0
 
 - name: アプリケーションのビルド
-  shell: /opt/maven/bin/mvn clean install chdir=/home/ec2-user/terasoluna-tourreservation/
+  shell: /opt/maven/bin/mvn install chdir=/home/ec2-user/terasoluna-tourreservation/
   register: codebuild_status
   failed_when: codebuild_status.rc != 0
