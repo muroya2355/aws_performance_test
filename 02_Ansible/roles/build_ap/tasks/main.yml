@@ -5,8 +5,8 @@
 
 - name: ソースコードを取得
   ansible.builtin.git:
-  repo: https://github.com/terasolunaorg/terasoluna-tourreservation.git
-  dest: /home/ec2-user/
+    repo: https://github.com/terasolunaorg/terasoluna-tourreservation.git
+    dest: /home/ec2-user/
   when: not sourcecode_dir.stat.exists
 
 # 設定ファイル配置
