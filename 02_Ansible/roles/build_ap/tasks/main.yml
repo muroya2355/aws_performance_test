@@ -31,4 +31,4 @@
 - name: DB初期化
   shell: bash -lc "mvn -f /home/ec2-user/terasoluna-tourreservation/terasoluna-tourreservation-initdb/pom.xml sql:execute"
   register: initdb_status
-  failed_when: initdb_status.rc != '0'
+  failed_when: initdb_status.rc != 0
