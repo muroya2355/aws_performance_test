@@ -3,6 +3,9 @@
   Description: 'DB (RDS/SG)'
 
   Parameters:
+    DatabaseName:
+      Type: String
+      Default: tourreserve
     RDSEngineVersion:
       Type: String
       Default: 12.8
@@ -30,7 +33,7 @@
     DB:
       Type: AWS::RDS::DBInstance
       Properties:
-        DBName: pgdb
+        DBName: !Ref DatabaseName
         Engine: postgres
         EngineVersion: !Ref RDSEngineVersion
         MultiAZ: !Ref isMultiAZ
