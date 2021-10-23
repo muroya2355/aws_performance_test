@@ -3,6 +3,9 @@
   Description: 'DB (RDS/SG)'
 
   Parameters:
+    DBInstanceID:
+      Type: String
+      Default: db
     DatabaseName:
       Type: String
       Default: tourreserve
@@ -28,11 +31,15 @@
       NoEcho: true
       Type: String
       Default: P0stgres
+    PrivateHostedZoneName:
+      Type: String
+      Default: tourreserve.local
 
   Resources:
     DB:
       Type: AWS::RDS::DBInstance
       Properties:
+        DBInstanceIdentifier: !Ref DBInstanceID
         DBName: !Ref DatabaseName
         Engine: postgres
         EngineVersion: !Ref RDSEngineVersion
@@ -66,6 +73,10 @@
             FromPort: 5432
             ToPort: 5432
             SourceSecurityGroupId: !ImportValue WebAPEC2SG
+          - IpProtocol: tcp
+            FromPort: 5432
+            ToPort: 5432
+            SourceSecurityGroupId: !ImportValue TestEC2SG
 
     DBSubnetGroup:
       Type: AWS::RDS::DBSubnetGroup
@@ -74,3 +85,38 @@
         SubnetIds:
           - !Select [0, !Split [",", !ImportValue PrivateSubnetIDs]]
           - !Select [1, !Split [",", !ImportValue PrivateSubnetIDs]]
+
+    PrivateHostedZone:
+      Type: AWS::Route53::HostedZone
+      Properties:
+        Name:
+          !Ref PrivateHostedZoneName
+        VPCs:
+          - VPCId:
+              !ImportValue VPCID
+            VPCRegion:
+              Fn::Sub: "${AWS::Region}"
+
+    DNSRecordSet:
+      DependsOn: PrivateHostedZone
+      Type: AWS::Route53::RecordSet
+      Properties:
+        HostedZoneId: !Ref PrivateHostedZone
+        Name: !Sub db.${PrivateHostedZoneName}
+        Type: CNAME
+        TTL: '300'
+        ResourceRecords:
+        - !GetAtt DB.Endpoint.Address
+
+
+
+  Outputs:
+    DBInstanceID:
+      Value: !Ref DB
+      Export:
+        Name: DBInstanceID
+
+    DBInstanceEndpoint:
+      Value: !GetAtt DB.Endpoint.Address
+      Export:
+        Name: DBInstanceEndpoint

@@ -19,7 +19,7 @@ SG
 	セキュリティグループ
 
 DB(performance-test-RDS)
-
+psql -h db.tourreserve.local -U postgres -d tourreserve
 
 
 ansible-inventory -i inventory_aws_ec2.yaml --graph

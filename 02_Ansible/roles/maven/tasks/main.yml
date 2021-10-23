@@ -1,23 +1,23 @@
 # ソフトウェアダウンロード、配置
 - name: Mavenインストーラがあるか確認
-  stat: path=/tmp/apache-maven-3.6.3-bin.tar.gz
+  stat: path=/tmp/apache-maven-3.8.3-bin.tar.gz
   register: maven_targz
 
 - name: Mavenのインストーラを取得
   get_url:
-    url: https://archive.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
+    url: https://dlcdn.apache.org/maven/maven-3/3.8.3/binaries/apache-maven-3.8.3-bin.tar.gz
     dest: /tmp/apache-maven-3.6.3-bin.tar.gz
-    checksum: sha512:c35a1803a6e70a126e80b2b3ae33eed961f83ed74d18fcd16909b2d44d7dada3203f1ffe726c17ef8dcca2dcaa9fca676987befeadc9b9f759967a8cb77181c0
+    checksum: sha512:1c12a5df43421795054874fd54bb8b37d242949133b5bf6052a063a13a93f13a20e6e9dae2b3d85b9c7034ec977bbc2b6e7f66832182b9c863711d78bfe60faa
     force: True
   when: not maven_targz.stat.exists
 
 - name: Mavenホームディレクトリがあるか確認
-  stat: path=/opt/apache-maven-3.6.3
+  stat: path=/opt/apache-maven-3.8.3
   register: maven_dir
 
 - name: Mavenホームディレクトリがない場合、作成
   unarchive:
-    src: /tmp/apache-maven-3.6.3-bin.tar.gz
+    src: /tmp/apache-maven-3.8.3-bin.tar.gz
     dest:  /opt
     remote_src: yes
   become: yes
@@ -25,6 +25,6 @@
     - not maven_dir.stat.exists
     - not ansible_check_mode
 
-- name: リンクの作成（/opt/maven -> /opt/apache-maven-3.6.3）
-  file: src=/opt/apache-maven-3.6.3 path=/opt/maven state=link
+- name: リンクの作成（/opt/maven -> /opt/apache-maven-3.8.3）
+  file: src=/opt/apache-maven-3.8.3 path=/opt/maven state=link
   when: not ansible_check_mode
