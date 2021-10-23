@@ -7,3 +7,4 @@
   roles:
     - coretto
     - maven
+    - build_ap
