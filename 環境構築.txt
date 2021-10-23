@@ -22,3 +22,8 @@ DB(performance-test-RDS)
 
 
 
+ansible-inventory -i inventory_aws_ec2.yaml --graph
+
+ansible-playbook -i inventory_aws_ec2.yaml playbook.yaml -e "target_hosts=tag_tour_reservation"
+
+

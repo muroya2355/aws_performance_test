@@ -9,8 +9,8 @@
   become: yes
 
   roles:
-    - common
-#    - httpd
+#    - common_for_RHEL
+    - httpd
 #    - java
 #    - tomcat
 #    - maven
