@@ -11,6 +11,7 @@
   roles:
 #    - common_for_RHEL
     - httpd
-    - java
+#    - openjdk
+    - coretto
     - tomcat
 #    - maven

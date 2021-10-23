@@ -1,0 +1,26 @@
+# Javaがインストールされているか確認
+- name: javaの存在確認
+  shell: which java
+  register: java_which
+  failed_when: java_which.rc not in [0, 1]
+
+
+# javaがインストールされていない場合, Javaをインストール
+- name: Amazon Corretto 11のインストール
+  yum: name=java-11-amazon-corretto state=present
+  when:
+    - not ansible_check_mode
+    - java_which.rc == 1
+
+
+# 環境変数の設定
+- name: .bash_profileに追記
+  blockinfile:
+    dest: /root/.bash_profile
+    insertafter: EOF
+    content: |
+      JAVA_HOME=/usr/lib/jvm/java-11-amazon-corretto.x86_64
+      export PATH=$PATH:/opt/maven/bin
+
+- name: .bash_profileの反映
+  shell: source /root/.bash_profile
