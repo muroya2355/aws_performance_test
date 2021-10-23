@@ -32,3 +32,8 @@
   shell: bash -lc "mvn -f /home/ec2-user/terasoluna-tourreservation/terasoluna-tourreservation-initdb/pom.xml sql:execute"
   register: initdb_status
   failed_when: initdb_status.rc != 0
+
+- name: アプリケーションのビルド
+  shell: bash -lc "mvn clean install -f /home/ec2-user/terasoluna-tourreservation/pom.xml"
+  register: codebuild_status
+  failed_when: codebuild_status.rc != 0
