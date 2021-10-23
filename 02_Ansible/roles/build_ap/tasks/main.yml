@@ -6,15 +6,15 @@
 - name: ソースコードを取得
   ansible.builtin.git:
     repo: https://github.com/terasolunaorg/terasoluna-tourreservation.git
-    dest: /home/ec2-user
+    dest: /home/ec2-user/terasoluna-tourreservation
   when: not sourcecode_dir.stat.exists
 
 # 設定ファイル配置
-- name: DB接続ファイルの配置
-  copy:
-    src: ../files/terasoluna-tourreservation-infra.properties
-    dest: /etc/systemd/system/tomcat.service
-    mode: 0755
+#- name: DB接続ファイルの配置
+#  copy:
+#    src: ../files/terasoluna-tourreservation-infra.properties
+#    dest: /etc/systemd/system/tomcat.service
+#    mode: 0755
 
 #- name: server.xmlの配置
 #  copy:
