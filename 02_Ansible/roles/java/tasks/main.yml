@@ -1,4 +1,3 @@
-#http://tsujitaku50.hatenablog.com/entry/2017/03/29/192845
 # Javaがインストールされているか確認
 - name: javaの存在確認
   shell: which java

@@ -31,5 +31,5 @@ Tomcat
 #https://weblabo.oscasierra.net/installing-tomcat9-centos7-1/
 #https://github.com/ansible/ansible-examples/blob/master/tomcat-standalone/roles/tomcat/tasks/main.yml
 #https://qiita.com/sunack/items/273ac7f71faf99088e4d
-
+#http://tsujitaku50.hatenablog.com/entry/2017/03/29/192845
 
