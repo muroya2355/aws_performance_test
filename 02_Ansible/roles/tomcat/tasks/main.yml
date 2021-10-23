@@ -1,0 +1,81 @@
+# Tomcatがインストールされ、起動しているか確認
+# リターンコードが0：起動済み。3：インストール済みで停止。4：未インストール
+- name: Tomcat起動状態確認
+  shell: systemctl status tomcat
+  register: tomcat_status
+  failed_when: tomcat_status.rc not in [0, 3, 4]
+
+# Tomcatユーザ作成
+- name: Tomcatグループの作成
+  group: name=tomcat
+
+- name: Tomcatユーザの作成
+  user: name=tomcat group=tomcat
+  become: True
+  become_method: sudo
+
+# ソフトウェアダウンロード、配置
+- name: Tomcatインストーラがあるか確認
+  stat: path=/tmp/apache-tomcat-9.0.54.tar.gz
+  register: tomcat_targz
+
+- name: Tomcatのインストーラを取得
+  get_url:
+    url: https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.54/bin/apache-tomcat-9.0.54.tar.gz
+    dest: /tmp/apache-tomcat-9.0.54.tar.gz
+    checksum: sha512:83430f24d42186ce2ff51eeef2f7a5517048f37d9050c45cac1e3dba8926d61a1f7f5aba122a34a11ac1dbdd3c1f6d98671841047df139394d43751263de57c3
+    force: True
+  when: not tomcat_targz.stat.exists
+
+- name: Tomcatホームディレクトリがあるか確認
+  stat: path=/opt/apache-tomcat-9.0.54.tar.gz
+  register: tomcat_dir
+
+- name: Tomcatホームディレクトリがない場合、作成
+  unarchive:
+    src: /tmp/apache-tomcat-9.0.54.tar.gz
+    dest:  /opt
+    remote_src: yes
+  become: yes
+  when:
+    - not tomcat_dir.stat.exists
+    - not ansible_check_mode
+
+- name: リンクの作成（/opt/tomcat -> /opt/apache-tomcat-9.0.54）
+  file: src=/opt/apache-tomcat-9.0.54 path=/opt/tomcat state=link
+  when: not ansible_check_mode
+
+- name: ディレクトリの属性変更
+  file: path=/opt/tomcat owner=tomcat group=tomcat state=directory recurse=yes
+  when: not ansible_check_mode
+
+# 設定ファイル配置
+- name: serviceファイルの配置
+  copy:
+    src: ../files/tomcat.service
+    dest: /etc/systemd/system/tomcat.service
+    mode: 0755
+
+- name: server.xmlの配置
+  copy:
+    src: ../files/server.xml
+    dest: /opt/tomcat/conf/server.xml
+    owner: tomcat
+    group: tomcat
+    mode: 0644
+
+
+# ログ出力先の変更
+- name: ディレクトリの作成
+  file: path=/var/log/tomcat state=directory owner=tomcat group=tomcat mode=0750
+
+- name: 元のディレクトリの削除
+  file: path=/opt/tomcat/logs state=absent
+
+- name: リンクの作成
+  file: src=/var/log/tomcat path=/opt/tomcat/logs state=link
+  when: not ansible_check_mode
+
+# サービス起動
+- name: サービスの起動
+  service: name=tomcat state=restarted enabled=yes

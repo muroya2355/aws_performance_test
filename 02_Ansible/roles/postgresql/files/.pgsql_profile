@@ -1,0 +1,4 @@
+PATH=/usr/pgsql-12/bin:$PATH
+MANPATH=/usr/pgsql-12/share/man:$MANPATH
+PGDATA=/var/lib/pgsql/12/data
+export PATH MANPATH PGDATA

@@ -27,3 +27,9 @@ ansible-inventory -i inventory_aws_ec2.yaml --graph
 ansible-playbook -i inventory_aws_ec2.yaml playbook.yaml -e "target_hosts=tag_tour_reservation"
 
 
+Tomcat
+#https://weblabo.oscasierra.net/installing-tomcat9-centos7-1/
+#https://github.com/ansible/ansible-examples/blob/master/tomcat-standalone/roles/tomcat/tasks/main.yml
+#https://qiita.com/sunack/items/273ac7f71faf99088e4d
+
+

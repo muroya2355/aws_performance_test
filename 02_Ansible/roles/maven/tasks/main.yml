@@ -1,0 +1,30 @@
+# ソフトウェアダウンロード、配置
+- name: Mavenインストーラがあるか確認
+  stat: path=/tmp/apache-maven-3.6.3-bin.tar.gz
+  register: maven_targz
+
+- name: Mavenのインストーラを取得
+  get_url:
+    url: https://archive.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
+    dest: /tmp/apache-maven-3.6.3-bin.tar.gz
+    checksum: sha512:c35a1803a6e70a126e80b2b3ae33eed961f83ed74d18fcd16909b2d44d7dada3203f1ffe726c17ef8dcca2dcaa9fca676987befeadc9b9f759967a8cb77181c0
+    force: True
+  when: not maven_targz.stat.exists
+
+- name: Mavenホームディレクトリがあるか確認
+  stat: path=/opt/apache-maven-3.6.3
+  register: maven_dir
+
+- name: Mavenホームディレクトリがない場合、作成
+  unarchive:
+    src: /tmp/apache-maven-3.6.3-bin.tar.gz
+    dest:  /opt
+    remote_src: yes
+  become: yes
+  when:
+    - not maven_dir.stat.exists
+    - not ansible_check_mode
+
+- name: リンクの作成（/opt/maven -> /opt/apache-maven-3.6.3）
+  file: src=/opt/apache-maven-3.6.3 path=/opt/maven state=link
+  when: not ansible_check_mode
