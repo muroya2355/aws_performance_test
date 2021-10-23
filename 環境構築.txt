@@ -1,0 +1,24 @@
+
+
+NW (performance-test-VPC)
+	VPC
+	サブネット
+	ルートテーブル
+
+EC2
+	IAMロール(performance-test-IAMRole)
+	試験用EC2(performance-test-TestEC2)
+	Web/AP用EC2(performance-test-WebAPEC2ELB)
+	AutoScalingGroup
+
+ELB
+	ELB
+	ターゲットグループ
+
+SG
+	セキュリティグループ
+
+DB(performance-test-RDS)
+
+
+
