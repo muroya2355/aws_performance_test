@@ -3,17 +3,17 @@
   yum: name=httpd state=latest
 
 # 設定ファイルの配置
-#- name: 00-proxy.confの配置
-#  copy:
-#    src: ../files/00-proxy.conf
-#    dest: /etc/httpd/conf.modules.d/00-proxy.conf
-#    mode: 0644
+- name: 00-proxy.confの配置
+  copy:
+    src: ../files/00-proxy.conf
+    dest: /etc/httpd/conf.modules.d/00-proxy.conf
+    mode: 0644
 
-#- name: httpd.confの配置
-#  copy:
-#    src: ../files/httpd.conf
-#    dest: /etc/httpd/conf/httpd.conf
-#    mode: 0644
+- name: httpd.confの配置
+  copy:
+    src: ../files/httpd.conf
+    dest: /etc/httpd/conf/httpd.conf
+    mode: 0644
 
 # ファイアウォール設定
 #- name: firewalldでHTTPを許可
