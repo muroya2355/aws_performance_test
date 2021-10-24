@@ -10,6 +10,7 @@
 
   roles:
 #    - common_for_RHEL
+    - cloudwatch_agent
     - httpd
 #    - openjdk
     - coretto

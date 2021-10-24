@@ -5,6 +5,7 @@
   become: yes
 
   roles:
+    - cloudwatch_agent
     - coretto
     - maven
     - build_ap
