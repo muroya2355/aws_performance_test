@@ -4,7 +4,7 @@
 - name: 設定ファイルの配置
   copy:
     src: ../files/amazon-cloudwatch-agent.json
-    dest: /opt/aws/amazon-cloudwatch-agent/etc/in-amazon-cloudwatch-agent.json
+    dest: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
     mode: '0644'
 
 - name: cloudwatch-agent fetch config
