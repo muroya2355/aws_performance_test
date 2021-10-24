@@ -21,6 +21,10 @@ SG
 DB(performance-test-RDS)
 psql -h db.tourreserve.local -U postgres -d tourreserve
 
+
+DNS(performance-test-DNS)
+
+
 ansible-playbook testec2.yaml
 
 ansible-inventory -i inventory_aws_ec2.yaml --graph

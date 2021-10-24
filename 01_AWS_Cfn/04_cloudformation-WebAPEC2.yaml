@@ -228,3 +228,11 @@
       Value: !Ref WebAPEC2SG
       Export:
         Name: WebAPEC2SG
+    WebAPLocalALBID:
+      Value: !GetAtt WebAPLocalALB.CanonicalHostedZoneID
+      Export:
+        Name: WebAPLocalALBID
+    WebAPLocalALBDNS:
+      Value: !GetAtt WebAPLocalALB.DNSName
+      Export:
+        Name: WebAPLocalALBDNS

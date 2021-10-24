@@ -1,0 +1,42 @@
+---
+  AWSTemplateFormatVersion: '2010-09-09'
+  Description: 'DNS'
+
+  Parameters:
+    PrivateHostedZoneName:
+      Type: String
+      Default: tourreserve.com
+
+  Resources:
+    PrivateHostedZone:
+      Type: AWS::Route53::HostedZone
+      Properties:
+        Name:
+          !Ref PrivateHostedZoneName
+        VPCs:
+          - VPCId:
+              !ImportValue VPCID
+            VPCRegion:
+              Fn::Sub: "${AWS::Region}"
+
+    LocalELBDNSRecordSet:
+      DependsOn: PrivateHostedZone
+      Type: AWS::Route53::RecordSet
+      Properties:
+        HostedZoneId: !Ref PrivateHostedZone
+        Name: !Sub local.www.${PrivateHostedZoneName}
+        Type: A
+        AliasTarget:
+          HostedZoneId: !ImportValue WebAPLocalALBID
+          DNSName: !ImportValue WebAPLocalALBDNS
+
+    DBDNSRecordSet:
+      DependsOn: PrivateHostedZone
+      Type: AWS::Route53::RecordSet
+      Properties:
+        HostedZoneId: !Ref PrivateHostedZone
+        Name: !Sub local.db.${PrivateHostedZoneName}
+        Type: CNAME
+        TTL: '300'
+        ResourceRecords:
+        - !ImportValue DBInstanceEndpoint

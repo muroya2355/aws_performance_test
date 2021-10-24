@@ -23,7 +23,7 @@
       <properties>
         <db.encoding>UTF8</db.encoding>
         <db.basedir>${project.basedir}/src/main/sqls/postgres</db.basedir>
-        <db.url>jdbc:postgresql://db.tourreserve.local:5432/tourreserve</db.url>
+        <db.url>jdbc:postgresql://local.db.tourreserve.com:5432/tourreserve</db.url>
         <db.username>postgres</db.username>
         <db.password>P0stgres</db.password>
         <db.driver>org.postgresql.Driver</db.driver>

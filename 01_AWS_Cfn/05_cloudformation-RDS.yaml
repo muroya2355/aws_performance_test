@@ -31,9 +31,7 @@
       NoEcho: true
       Type: String
       Default: P0stgres
-    PrivateHostedZoneName:
-      Type: String
-      Default: tourreserve.local
+
 
   Resources:
     DB:
@@ -85,29 +83,6 @@
         SubnetIds:
           - !Select [0, !Split [",", !ImportValue PrivateSubnetIDs]]
           - !Select [1, !Split [",", !ImportValue PrivateSubnetIDs]]
-
-    PrivateHostedZone:
-      Type: AWS::Route53::HostedZone
-      Properties:
-        Name:
-          !Ref PrivateHostedZoneName
-        VPCs:
-          - VPCId:
-              !ImportValue VPCID
-            VPCRegion:
-              Fn::Sub: "${AWS::Region}"
-
-    DNSRecordSet:
-      DependsOn: PrivateHostedZone
-      Type: AWS::Route53::RecordSet
-      Properties:
-        HostedZoneId: !Ref PrivateHostedZone
-        Name: !Sub db.${PrivateHostedZoneName}
-        Type: CNAME
-        TTL: '300'
-        ResourceRecords:
-        - !GetAtt DB.Endpoint.Address
-
 
 
   Outputs:
