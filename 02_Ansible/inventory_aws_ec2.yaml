@@ -19,5 +19,5 @@ compose:
 
 cache: yes
 cache_plugin: jsonfile
-cache_timeout: 300
+cache_timeout: 600
 cache_connection: $HOME/aws_performance_test/aws_inventory
