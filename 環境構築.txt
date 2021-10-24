@@ -21,12 +21,13 @@ SG
 DB(performance-test-RDS)
 psql -h db.tourreserve.local -U postgres -d tourreserve
 
+ansible-playbook testec2.yaml
 
 ansible-inventory -i inventory_aws_ec2.yaml --graph
 
 ansible-playbook -i inventory_aws_ec2.yaml playbook.yaml -e "target_hosts=tag_tour_reservation"
 ansible-playbook -i inventory_aws_ec2.yaml webap.yaml -e "target_hosts=tag_tour_reservation"
-ansible-playbook testec2.yaml
+
 
 Tomcat
 #https://weblabo.oscasierra.net/installing-tomcat9-centos7-1/

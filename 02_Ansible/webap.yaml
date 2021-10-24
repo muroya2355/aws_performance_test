@@ -14,3 +14,4 @@
 #    - openjdk
     - coretto
     - tomcat
+    - deploy_ap
