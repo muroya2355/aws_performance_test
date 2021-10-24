@@ -1,0 +1,5 @@
+- name: warファイルを取得
+  copy:
+    src: /home/ec2-user/terasoluna-tourreservation/terasoluna-tourreservation-web/target/terasoluna-tourreservation-web.war
+    dest: /opt/tomcat/webapps
+    mode: 0755
