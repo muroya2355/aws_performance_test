@@ -57,12 +57,12 @@
           Fn::Base64: |
             #!/bin/bash
             sudo yum install -y git
+            sudo yum -y install postgresql.x86_64
             sudo amazon-linux-extras enable ansible2
-            sudo yum install -y python3
             sudo yum install -y ansible
             ansible-galaxy collection install amazon.aws
-            pip3 install boto3 botocore
-            sudo yum -y install postgresql.x86_64
+#            sudo yum install -y python3
+#            pip3 install boto3 botocore
         Tags:
             - Key: Name
               Value: test1

@@ -1,0 +1,30 @@
+# ソフトウェアダウンロード、配置
+- name: JMeterインストーラがあるか確認
+  stat: path=/tmp/apache-jmeter-5.4.1.tgz
+  register: jmeter_tgz
+
+- name: JMeterのインストーラを取得
+  get_url:
+    url: https://dlcdn.apache.org//jmeter/binaries/apache-jmeter-5.4.1.tgz
+    dest: /tmp/apache-jmeter-5.4.1.tgz
+    checksum: sha512:bfc0faa84769b58c1fd498417b3a5c65749f52226bd6e3533f08ca7ea4a3798bb8d2cbd7091b443dd6837f3cbea5565c3c18e6497b40bec95616bf44dfdf590d
+    force: True
+  when: not jmeter_tgz.stat.exists
+
+- name: JMeterホームディレクトリがあるか確認
+  stat: path=/opt/apache-jmeter-5.4.1
+  register: jmeter_dir
+
+- name: JMeterホームディレクトリがない場合、作成
+  unarchive:
+    src: /tmp/apache-jmeter-5.4.1.tgz
+    dest: /opt
+    remote_src: yes
+  become: yes
+  when:
+    - not jmeter_dir.stat.exists
+    - not ansible_check_mode
+
+- name: リンクの作成（/opt/jmeter -> /opt/apache-jmeter-5.4.1）
+  file: src=/opt/apache-jmeter-5.4.1 path=/opt/jmeter state=link
+  when: not ansible_check_mode
