@@ -11,7 +11,7 @@
       Default: "key-performance-test"
     EC2InstanceType:
       Type: String
-      Default: t3.nano
+      Default: t3.micro
     FromIPSegment:
       Type: String
       Default: XXX.XXX.XXX.XXX/32
