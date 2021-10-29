@@ -1,4 +1,4 @@
-plugin: amazon.aws.aws_ec2
+plugin: aws_ec2
 reginos:
   - ap-northeast-1
 

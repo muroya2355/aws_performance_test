@@ -3,28 +3,46 @@
   Description: 'TestEC2/SG/Key'
   
   Parameters:
-    TestEC2PrivateIP:
+  # ------------------------
+  # TestLinux用パラメータ
+  # ------------------------
+    TestLinuxPrivateIP:
       Type: String
       Default: 192.168.10.11
-    EC2ImageID:
+    TestLinuxImageID:
       Type: AWS::SSM::Parameter::Value<String>
       Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
-    EC2InstanceType:
+    TestLinuxInstanceType:
       Type: String
-      Default: t3.nano
+      Default: t3.micro
     KeyName:
       Type: "AWS::EC2::KeyPair::KeyName"
       Default: "key-performance-test"
     FromIPSegment:
       Type: String
       Default: XXX.XXX.XXX.XXX/32
+  # ------------------------
+  # TestWin用パラメータ
+  # ------------------------
+    TestWinPrivateIP:
+      Type: String
+      Default: 192.168.30.21
+    TestWinImageID:
+      Type: AWS::SSM::Parameter::Value<String>
+      Default: /aws/service/ami-windows-latest/Windows_Server-2019-Japanese-Full-Base
+    TestWinInstanceType:
+      Type: String
+      Default: t3.small
 
   Resources:
-    TestEC2SG:
+  # ------------------------
+  # TestLinux用リソース
+  # ------------------------
+    TestLinuxSG:
       Type: AWS::EC2::SecurityGroup
       Properties:
-        GroupName: sg_test1
-        GroupDescription: "SG for TestEC2"
+        GroupName: sg_testlinux
+        GroupDescription: "SG for TestLinux"
         VpcId: !ImportValue VPCID
         SecurityGroupIngress:
           - IpProtocol: tcp
@@ -32,27 +50,33 @@
             ToPort: 22
             CidrIp: !Ref FromIPSegment
 
-    TestEC2IAMInstanceProfile:
+    TestLinuxIAMInstanceProfile:
       Type: "AWS::IAM::InstanceProfile"
       Properties:
         Path: "/"
         Roles:
         - !ImportValue EC2IAMRole
 
-    TestEC2Instance:
+    TestLinuxInstance:
       Type: AWS::EC2::Instance
       Properties: 
-        ImageId: !Ref EC2ImageID
+        ImageId: !Ref TestLinuxImageID
         KeyName: !Ref KeyName
-        InstanceType: !Ref EC2InstanceType
+        InstanceType: !Ref TestLinuxInstanceType
         NetworkInterfaces:
           - AssociatePublicIpAddress: "true"
             DeviceIndex: "0"
             SubnetId: !Select [0, !Split [",", !ImportValue PublicSubnetIDs]]
-            PrivateIpAddress: !Ref TestEC2PrivateIP
+            PrivateIpAddress: !Ref TestLinuxPrivateIP
             GroupSet:
-              - !Ref TestEC2SG
-        IamInstanceProfile: !Ref TestEC2IAMInstanceProfile
+              - !Ref TestLinuxSG
+        BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeType: gp2
+            VolumeSize: 8
+            DeleteOnTermination: true
+        IamInstanceProfile: !Ref TestLinuxIAMInstanceProfile
         UserData:
           Fn::Base64: |
             #!/bin/bash
@@ -60,15 +84,68 @@
             sudo yum -y install postgresql.x86_64
             sudo amazon-linux-extras enable ansible2
             sudo yum install -y ansible
-            ansible-galaxy collection install amazon.aws
-#            sudo yum install -y python3
-#            pip3 install boto3 botocore
+            sudo ansible-galaxy collection install amazon.aws
+            sudo yum install -y python3
+            pip3 install boto3
+#            sudo yum -y install python-pip
+#            pip2 install --use-feature=2020-resolver boto3 botocore
+
         Tags:
             - Key: Name
-              Value: test1
+              Value: testlinux
+
+  # ------------------------
+  # TestLinux用パラメータ
+  # ------------------------
+    TestWinSG:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        GroupName: sg_testwin
+        GroupDescription: "SG for TestWin"
+        VpcId: !ImportValue VPCID
+        SecurityGroupIngress:
+          - IpProtocol: tcp
+            FromPort: 3389
+            ToPort: 3389
+            SourceSecurityGroupId: !Ref TestLinuxSG
+
+    TestWinIAMInstanceProfile:
+      Type: "AWS::IAM::InstanceProfile"
+      Properties:
+        Path: "/"
+        Roles:
+        - !ImportValue EC2IAMRole
+
+    TestWinInstance:
+      Type: AWS::EC2::Instance
+      Properties: 
+        ImageId: !Ref TestWinImageID
+        KeyName: !Ref KeyName
+        InstanceType: !Ref TestWinInstanceType
+        NetworkInterfaces:
+          - DeviceIndex: "0"
+            SubnetId: !Select [0, !Split [",", !ImportValue PrivateSubnetIDs]]
+            PrivateIpAddress: !Ref TestWinPrivateIP
+            GroupSet:
+              - !Ref TestWinSG
+        BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeType: gp2
+            VolumeSize: 30
+            DeleteOnTermination: true
+        IamInstanceProfile: !Ref TestWinIAMInstanceProfile
+        Tags:
+            - Key: Name
+              Value: testwin
+
 
   Outputs:
-    TestEC2SG:
-      Value: !Ref TestEC2SG
+    TestLinuxSG:
+      Value: !Ref TestLinuxSG
       Export:
-        Name: TestEC2SG
+        Name: TestLinuxSG
+    TestWinSG:
+      Value: !Ref TestWinSG
+      Export:
+        Name: TestWinSG

@@ -74,7 +74,7 @@
           - IpProtocol: tcp
             FromPort: 5432
             ToPort: 5432
-            SourceSecurityGroupId: !ImportValue TestEC2SG
+            SourceSecurityGroupId: !ImportValue TestLinuxSG
 
     DBSubnetGroup:
       Type: AWS::RDS::DBSubnetGroup

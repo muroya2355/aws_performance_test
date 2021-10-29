@@ -12,9 +12,9 @@
     EC2InstanceType:
       Type: String
       Default: t3.micro
-    FromIPSegment:
-      Type: String
-      Default: XXX.XXX.XXX.XXX/32
+#    FromIPSegment:
+#      Type: String
+#      Default: XXX.XXX.XXX.XXX/32
 
   Resources:
   # ---------------------------------------------------------------
@@ -57,10 +57,10 @@
         GroupDescription: "SG for WebAPEC2"
         VpcId: !ImportValue VPCID
         SecurityGroupIngress:
-          - IpProtocol: tcp
-            FromPort: 80
-            ToPort: 80
-            SourceSecurityGroupId: !Ref WebAPInternetALBSG
+#          - IpProtocol: tcp
+#            FromPort: 80
+#            ToPort: 80
+#            SourceSecurityGroupId: !Ref WebAPInternetALBSG
           - IpProtocol: tcp
             FromPort: 80
             ToPort: 80
@@ -68,7 +68,7 @@
           - IpProtocol: tcp
             FromPort: 22
             ToPort: 22
-            SourceSecurityGroupId: !ImportValue TestEC2SG
+            SourceSecurityGroupId: !ImportValue TestLinuxSG
 
     WebAPAutoScalingGroup:
       Type: AWS::AutoScaling::AutoScalingGroup
@@ -81,11 +81,11 @@
           LaunchTemplateId: !Ref WebAPLaunchTemplate
           Version: !GetAtt WebAPLaunchTemplate.LatestVersionNumber
         TargetGroupARNs:
-          - !Ref WebAPTargetGroup
+#          - !Ref WebAPTargetGroup
           - !Ref WebAPLocalTargetGroup
-        DesiredCapacity: 1
+        DesiredCapacity: 0
         MaxSize: 1
-        MinSize: 1
+        MinSize: 0
         Tags:
           - Key: Name
             Value: webap
@@ -94,69 +94,69 @@
             Value: tour-reservation
             PropagateAtLaunch: true
 
-  # ---------------------------------------------------------------
-  # インターネット向けELB (TargetGroup/外部ALB/リスナー/SG)
-  # ---------------------------------------------------------------
-    WebAPTargetGroup: 
-      Type: "AWS::ElasticLoadBalancingV2::TargetGroup"
-      Properties: 
-        VpcId: !ImportValue VPCID
-        Name: WebAPTargetGroup
-        Protocol: HTTP
-        Port: 80
-        HealthCheckProtocol: HTTP
-        HealthCheckPath: "/"
-        HealthCheckPort: "traffic-port"
-        HealthyThresholdCount: 5
-        UnhealthyThresholdCount: 2
-        HealthCheckTimeoutSeconds: 5
-        HealthCheckIntervalSeconds: 10
-        Matcher: 
-          HttpCode: 200
-        Tags: 
-          - Key: Name
-            Value: webap-targetgroup
-
-    WebAPInternetALB:
-      Type: "AWS::ElasticLoadBalancingV2::LoadBalancer"
-      Properties: 
-        Name: WebAPInternetALB
-        Tags: 
-          - Key: Name
-            Value: webapelb-internet
-        Scheme: "internet-facing"
-        LoadBalancerAttributes:
-          - Key: "deletion_protection.enabled"
-            Value: false
-          - Key: "idle_timeout.timeout_seconds"
-            Value: 60
-        SecurityGroups:
-          - !Ref WebAPInternetALBSG
-        Subnets: 
-          - !Select [0, !Split [",", !ImportValue PublicSubnetIDs]]
-          - !Select [1, !Split [",", !ImportValue PublicSubnetIDs]]
-
-    WebAPInternetALBListener: 
-      Type: "AWS::ElasticLoadBalancingV2::Listener"
-      Properties: 
-        DefaultActions:
-          - TargetGroupArn: !Ref WebAPTargetGroup
-            Type: forward
-        LoadBalancerArn: !Ref WebAPInternetALB
-        Port: 80
-        Protocol: HTTP
-
-    WebAPInternetALBSG:
-      Type: AWS::EC2::SecurityGroup
-      Properties:
-        GroupName: sg_webapalb-internet
-        GroupDescription: "SG for WebAPInternetALB"
-        VpcId: !ImportValue VPCID
-        SecurityGroupIngress:
-          - IpProtocol: tcp
-            FromPort: 80
-            ToPort: 80
-            CidrIp: !Ref FromIPSegment
+#  # ---------------------------------------------------------------
+#  # インターネット向けELB (TargetGroup/外部ALB/リスナー/SG)
+#  # ---------------------------------------------------------------
+#    WebAPTargetGroup: 
+#      Type: "AWS::ElasticLoadBalancingV2::TargetGroup"
+#      Properties: 
+#        VpcId: !ImportValue VPCID
+#        Name: WebAPTargetGroup
+#        Protocol: HTTP
+#        Port: 80
+#        HealthCheckProtocol: HTTP
+#        HealthCheckPath: "/"
+#        HealthCheckPort: "traffic-port"
+#        HealthyThresholdCount: 5
+#        UnhealthyThresholdCount: 2
+#        HealthCheckTimeoutSeconds: 5
+#        HealthCheckIntervalSeconds: 10
+#        Matcher: 
+#          HttpCode: 200
+#        Tags: 
+#          - Key: Name
+#            Value: webap-targetgroup
+#
+#    WebAPInternetALB:
+#      Type: "AWS::ElasticLoadBalancingV2::LoadBalancer"
+#      Properties: 
+#        Name: WebAPInternetALB
+#        Tags: 
+#          - Key: Name
+#            Value: webapelb-internet
+#        Scheme: "internet-facing"
+#        LoadBalancerAttributes:
+#          - Key: "deletion_protection.enabled"
+#            Value: false
+#          - Key: "idle_timeout.timeout_seconds"
+#            Value: 60
+#        SecurityGroups:
+#          - !Ref WebAPInternetALBSG
+#        Subnets: 
+#          - !Select [0, !Split [",", !ImportValue PublicSubnetIDs]]
+#          - !Select [1, !Split [",", !ImportValue PublicSubnetIDs]]
+#
+#    WebAPInternetALBListener: 
+#      Type: "AWS::ElasticLoadBalancingV2::Listener"
+#      Properties: 
+#        DefaultActions:
+#          - TargetGroupArn: !Ref WebAPTargetGroup
+#            Type: forward
+#        LoadBalancerArn: !Ref WebAPInternetALB
+#        Port: 80
+#        Protocol: HTTP
+#
+#    WebAPInternetALBSG:
+#      Type: AWS::EC2::SecurityGroup
+#      Properties:
+#        GroupName: sg_webapalb-internet
+#        GroupDescription: "SG for WebAPInternetALB"
+#        VpcId: !ImportValue VPCID
+#        SecurityGroupIngress:
+#          - IpProtocol: tcp
+#            FromPort: 80
+#            ToPort: 80
+#            CidrIp: !Ref FromIPSegment
 
 
   # ---------------------------------------------------------------
@@ -220,7 +220,11 @@
           - IpProtocol: tcp
             FromPort: 80
             ToPort: 80
-            SourceSecurityGroupId: !ImportValue  TestEC2SG
+            SourceSecurityGroupId: !ImportValue  TestLinuxSG
+          - IpProtocol: tcp
+            FromPort: 80
+            ToPort: 80
+            SourceSecurityGroupId: !ImportValue  TestWinSG
 
 
   Outputs:
