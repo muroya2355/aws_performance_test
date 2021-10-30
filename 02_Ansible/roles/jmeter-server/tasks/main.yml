@@ -40,3 +40,7 @@
     src: ../files/jmeter.properties
     dest: /ope/jmeter/bin/jmeter.properties
     mode: 0755
+
+
+- name: サービスの起動
+  service: name=jmeter-server state=restarted enabled=yes
