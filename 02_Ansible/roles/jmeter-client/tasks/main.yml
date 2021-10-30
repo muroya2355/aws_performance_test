@@ -1,0 +1,22 @@
+- name: Amazon Corretto のインストーラを取得
+  ansible.windows.win_package:
+    path: https://corretto.aws/downloads/latest/amazon-corretto-11-x64-windows-jdk.msi
+    state: present
+
+- name: Jmeterのインストーラを取得
+  ansible.windows.win_get_url:
+    url: https://dlcdn.apache.org//jmeter/binaries/apache-jmeter-5.4.1.zip
+    dest: C:\Users\Administrator\Downloads\apache-jmeter-5.4.1.zip
+    checksum_url: https://www.apache.org/dist/jmeter/binaries/apache-jmeter-5.4.1.zip.sha512
+    checksum_algorithm: sha512
+    force: True
+
+- name: Jmeterインストーラを展開
+  win_unzip:
+    src: C:\Users\Administrator\Downloads\apache-jmeter-5.4.1.zip
+    dest: C:\Program Files
+
+#- name: Jmeterショートカットの作成
+#  win_shortcut:
+#    src: cmd.exe
+#    dest: Desktop\Command prompt.lnk

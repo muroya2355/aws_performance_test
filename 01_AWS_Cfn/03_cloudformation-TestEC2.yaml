@@ -128,7 +128,7 @@
             SourceSecurityGroupId: !Ref TestAnsibleSG
           - IpProtocol: tcp
             FromPort: 5986
-            ToPort: 5886
+            ToPort: 5986
             SourceSecurityGroupId: !Ref TestAnsibleSG
 
     TestWinIAMInstanceProfile:
