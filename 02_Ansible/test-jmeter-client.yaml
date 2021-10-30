@@ -1,0 +1,12 @@
+---
+- name: deploy jmeter-client
+  hosts: "{{ target_hosts }}"
+
+  vars:
+    ansible_user: Administrator
+    ansible_password: xxxxxxxxx
+
+  tasks:
+  - name: Print Name tag
+    debug:
+      msg: "{{ tags.Name }}"

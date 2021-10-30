@@ -153,6 +153,14 @@
             VolumeSize: 30
             DeleteOnTermination: true
         IamInstanceProfile: !Ref TestWinIAMInstanceProfile
+        UserData:
+          Fn::Base64: |
+            <powershell>
+            $url = "https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1"
+            $file = "$env:temp\ConfigureRemotingForAnsible.ps1"
+            (New-Object -TypeName System.Net.WebClient).DownloadFile($url, $file)
+            powershell.exe -ExecutionPolicy ByPass -File $file
+            </powershell>
         Tags:
             - Key: Name
               Value: test-win

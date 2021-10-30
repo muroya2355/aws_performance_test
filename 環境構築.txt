@@ -27,6 +27,7 @@ DNS(performance-test-DNS)
 ansible-inventory -i inventory_aws_ec2.yaml --graph
 
 ansible-playbook test-ansible.yaml
+ansible-playbook -i inventory_aws_ec2.yaml test-jmeter-client.yaml -e "target_hosts=tag_jmeter_client"
 ansible-playbook -i inventory_aws_ec2.yaml test-jmeter-server.yaml -e "target_hosts=tag_jmeter_server"
 ansible-playbook -i inventory_aws_ec2.yaml webap.yaml -e "target_hosts=tag_tour_reservation"
 
@@ -36,4 +37,13 @@ Tomcat
 #https://github.com/ansible/ansible-examples/blob/master/tomcat-standalone/roles/tomcat/tasks/main.yml
 #https://qiita.com/sunack/items/273ac7f71faf99088e4d
 #http://tsujitaku50.hatenablog.com/entry/2017/03/29/192845
+
+
+
+Windows
+
+$url = "https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1"
+$file = "$env:temp\ConfigureRemotingForAnsible.ps1"
+(New-Object -TypeName System.Net.WebClient).DownloadFile($url, $file)
+powershell.exe -ExecutionPolicy ByPass -File $file
 
