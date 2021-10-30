@@ -37,6 +37,8 @@
             Arn: !GetAtt
               - WebAPEC2IAMInstanceProfile
               - Arn
+          Monitoring:
+            Enabled: true
           TagSpecifications:
           - ResourceType: instance
             Tags:

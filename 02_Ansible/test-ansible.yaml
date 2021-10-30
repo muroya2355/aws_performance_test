@@ -6,6 +6,6 @@
 
   roles:
     - cloudwatch_agent
-    - coretto
+    - corretto
     - maven
     - build_ap
