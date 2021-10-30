@@ -1,3 +1,12 @@
+- name: Windows ファイアウォールの無効化
+  ansible.windows.win_firewall:
+    state: disabled
+    profiles:
+    - Domain
+    - Private
+    - Public
+
+
 - name: Amazon Corretto のインストーラを取得
   ansible.windows.win_package:
     path: https://corretto.aws/downloads/latest/amazon-corretto-11-x64-windows-jdk.msi
