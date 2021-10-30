@@ -131,6 +131,14 @@
             ToPort: 5986
             SourceSecurityGroupId: !Ref TestAnsibleSG
 
+    TestWinSecurityGroupIngress:
+      Type: AWS::EC2::SecurityGroupIngress
+      Properties:
+        GroupId: !Ref TestWinSG
+        IpProtocol: -1
+        SourceSecurityGroupId: !Ref TestJemeterSG
+
+
     TestWinIAMInstanceProfile:
       Type: "AWS::IAM::InstanceProfile"
       Properties:
@@ -186,6 +194,8 @@
             FromPort: 22
             ToPort: 22
             SourceSecurityGroupId: !Ref TestAnsibleSG
+          - IpProtocol: -1
+            SourceSecurityGroupId: !Ref TestWinSG
 
     TestJemeterIAMInstanceProfile:
       Type: "AWS::IAM::InstanceProfile"
