@@ -11,8 +11,5 @@
   roles:
 #    - common_for_RHEL
     - cloudwatch_agent
-    - httpd
-#    - openjdk
     - coretto
-    - tomcat
-    - deploy_ap
+    - jmeter-server
