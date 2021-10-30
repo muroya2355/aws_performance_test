@@ -1,6 +1,16 @@
 ---
-- name: deploy jmeter-client
-  hosts: windows
+- name: deploy jmeter-server
+  hosts: "{{ target_hosts }}"
+
+  vars:
+    ansible_user: Administrator
+    ansible_password: xxxxxx
+    ansible_connection: winrm
+    ansible_port: 5986
+    ansible_winrm_server_cert_validation: ignore
 
   roles:
-    - jmeter-client
+#    - common_for_RHEL
+    - cloudwatch_agent
+    - coretto
+    - jmeter-server

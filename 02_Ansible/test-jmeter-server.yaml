@@ -1,5 +1,5 @@
 ---
-- name: deploy jmeter-server
+- name: deploy webservers
   hosts: "{{ target_hosts }}"
 
   vars:
@@ -11,5 +11,8 @@
   roles:
 #    - common_for_RHEL
     - cloudwatch_agent
+    - httpd
+#    - openjdk
     - coretto
-    - jmeter-server
+    - tomcat
+    - deploy_ap
