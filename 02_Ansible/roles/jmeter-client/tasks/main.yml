@@ -7,7 +7,8 @@
   ansible.windows.win_get_url:
     url: https://dlcdn.apache.org//jmeter/binaries/apache-jmeter-5.4.1.zip
     dest: C:\Users\Administrator\Downloads\apache-jmeter-5.4.1.zip
-    checksum: sha512:78e41e5fbbc3d09319b9c2593286a6326b3cb111377944b2f41650a0c5adcb131a38898e7b856bd034557015d6e6b150d4ad585de780d622e28e5e62eb8bf82d
+    checksum: 78e41e5fbbc3d09319b9c2593286a6326b3cb111377944b2f41650a0c5adcb131a38898e7b856bd034557015d6e6b150d4ad585de780d622e28e5e62eb8bf82d
+    checksum_algorithm: sha512
     force: True
 
 - name: Jmeterインストーラを展開
