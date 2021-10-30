@@ -24,12 +24,10 @@ psql -h db.tourreserve.local -U postgres -d tourreserve
 
 DNS(performance-test-DNS)
 
-
-ansible-playbook testec2.yaml
-
 ansible-inventory -i inventory_aws_ec2.yaml --graph
 
-ansible-playbook -i inventory_aws_ec2.yaml playbook.yaml -e "target_hosts=tag_tour_reservation"
+ansible-playbook test-ansible.yaml
+ansible-playbook -i inventory_aws_ec2.yaml test-jmeter-server.yaml -e "target_hosts=tag_jmeter_server"
 ansible-playbook -i inventory_aws_ec2.yaml webap.yaml -e "target_hosts=tag_tour_reservation"
 
 

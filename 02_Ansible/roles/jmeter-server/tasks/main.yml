@@ -28,3 +28,9 @@
 - name: リンクの作成（/opt/jmeter -> /opt/apache-jmeter-5.4.1）
   file: src=/opt/apache-jmeter-5.4.1 path=/opt/jmeter state=link
   when: not ansible_check_mode
+
+- name: serviceファイルの配置
+  copy:
+    src: ../files/jmeter-server.service
+    dest: /etc/systemd/system/jmeter-server.service
+    mode: 0755

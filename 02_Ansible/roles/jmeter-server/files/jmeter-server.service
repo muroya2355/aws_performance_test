@@ -1,0 +1,10 @@
+[Unit]
+Description=Apache Jmeter Server
+After=syslog.target network.target
+ 
+[Service]
+Type=simple
+ExecStart=/opt/jmeter/bin/jmeter-server
+ 
+[Install]
+WantedBy=multi-user.target
