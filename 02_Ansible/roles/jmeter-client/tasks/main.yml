@@ -16,7 +16,12 @@
     src: C:\Users\Administrator\Downloads\apache-jmeter-5.4.1.zip
     dest: C:\Program Files
 
-#- name: Jmeterショートカットの作成
-#  win_shortcut:
-#    src: cmd.exe
-#    dest: Desktop\Command prompt.lnk
+- name: Jmeterショートカットの作成
+  win_shortcut:
+    src: C:\Program Files\apache-jmeter-5.4.1\bin\jmeter.bat
+    dest: Desktop\Jmeter-Client.lnk
+
+- name: jmeter.properties ファイルの配置
+  win_copy:
+    src: ../files/jmeter.properties
+    dest: C:\Program Files\apache-jmeter-5.4.1\bin\jmeter.properties
