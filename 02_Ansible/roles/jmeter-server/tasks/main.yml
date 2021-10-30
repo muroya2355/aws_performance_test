@@ -35,11 +35,11 @@
     dest: /etc/systemd/system/jmeter-server.service
     mode: 0755
 
-- name: jmeter.properties の配置
+- name: jmeter-server の配置
   copy:
-    src: ../files/jmeter.properties
-    dest: /opt/jmeter/bin/jmeter.properties
-    mode: 0755
+    src: ../files/jmeter-server
+    dest: /opt/jmeter/bin/jmeter-server
+    mode: 0644
 
 
 - name: サービスの起動
