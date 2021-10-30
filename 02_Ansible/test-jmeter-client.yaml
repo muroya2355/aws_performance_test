@@ -3,5 +3,4 @@
   hosts: windows
 
   roles:
-    - coretto
     - jmeter-server
