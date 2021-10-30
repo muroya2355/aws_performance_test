@@ -41,6 +41,11 @@
     dest: /opt/jmeter/bin/jmeter-server
     mode: 0755
 
+- name: jmeter.properties の配置
+  copy:
+    src: ../files/jmeter.properties
+    dest: /opt/jmeter/bin/jmeter.properties
+    mode: 0755
 
 - name: サービスの起動
   service: name=jmeter-server state=restarted enabled=yes
