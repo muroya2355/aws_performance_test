@@ -1,12 +1,9 @@
 ---
 - name: deploy jmeter-client
-  hosts: "{{ target_hosts }}"
-
-  vars:
-    ansible_user: Administrator
-    ansible_password: xxxxxxxxx
+  hosts: windows
 
   tasks:
-  - name: Print Name tag
-    debug:
-      msg: "{{ tags.Name }}"
+  - name: Install all security, critical, and rollup updates without a scheduled task
+    win_updates:
+      category_names:
+        - SecurityUpdates

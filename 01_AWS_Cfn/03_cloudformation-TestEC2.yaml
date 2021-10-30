@@ -113,7 +113,7 @@
 
 
   # ------------------------
-  # TestAnsible用パラメータ
+  # TestWindows用リソース
   # ------------------------
     TestWinSG:
       Type: AWS::EC2::SecurityGroup
@@ -125,6 +125,10 @@
           - IpProtocol: tcp
             FromPort: 3389
             ToPort: 3389
+            SourceSecurityGroupId: !Ref TestAnsibleSG
+          - IpProtocol: tcp
+            FromPort: 5986
+            ToPort: 5886
             SourceSecurityGroupId: !Ref TestAnsibleSG
 
     TestWinIAMInstanceProfile:
