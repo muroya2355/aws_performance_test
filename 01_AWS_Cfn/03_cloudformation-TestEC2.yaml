@@ -102,6 +102,7 @@
             sudo pip3.8 install --upgrade pip
             /usr/local/bin/pip3.8 install ansible
             /usr/local/bin/pip3.8 install boto3 botocore
+            /usr/local/bin/pip3.8 install pywinrm
             source .bash_profile
 #            sudo ansible-galaxy collection install amazon.aws
         Tags:

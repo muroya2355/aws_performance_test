@@ -34,3 +34,9 @@
     src: ../files/jmeter-server.service
     dest: /etc/systemd/system/jmeter-server.service
     mode: 0755
+
+- name: jmeter.properties の配置
+  copy:
+    src: ../files/jmeter.properties
+    dest: /ope/jmeter/bin/jmeter.properties
+    mode: 0755
