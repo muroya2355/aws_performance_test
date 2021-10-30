@@ -39,7 +39,7 @@
   copy:
     src: ../files/jmeter-server
     dest: /opt/jmeter/bin/jmeter-server
-    mode: 0644
+    mode: 0755
 
 
 - name: サービスの起動
