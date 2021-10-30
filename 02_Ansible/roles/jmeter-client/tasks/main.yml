@@ -1,5 +1,5 @@
 - name: Windows ファイアウォールの無効化
-  ansible.windows.win_firewall:
+  win_firewall:
     state: disabled
     profiles:
     - Domain
