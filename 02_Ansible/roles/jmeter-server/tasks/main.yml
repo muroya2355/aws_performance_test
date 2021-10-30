@@ -38,7 +38,7 @@
 - name: jmeter.properties の配置
   copy:
     src: ../files/jmeter.properties
-    dest: /ope/jmeter/bin/jmeter.properties
+    dest: /opt/jmeter/bin/jmeter.properties
     mode: 0755
 
 
