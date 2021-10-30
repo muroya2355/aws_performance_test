@@ -3,4 +3,4 @@
   hosts: windows
 
   roles:
-    - jmeter-server
+    - jmeter-client
