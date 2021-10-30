@@ -4,13 +4,10 @@
 
   vars:
     ansible_user: Administrator
-    ansible_password: xxxxxx
+    ansible_password: "xxxxxx"
     ansible_connection: winrm
     ansible_port: 5986
     ansible_winrm_server_cert_validation: ignore
 
   roles:
-#    - common_for_RHEL
-    - cloudwatch_agent
-    - coretto
-    - jmeter-server
+    - jmeter-client
