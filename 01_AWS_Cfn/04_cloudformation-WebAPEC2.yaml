@@ -68,7 +68,7 @@
           - IpProtocol: tcp
             FromPort: 22
             ToPort: 22
-            SourceSecurityGroupId: !ImportValue TestLinuxSG
+            SourceSecurityGroupId: !ImportValue TestAnsibleSG
 
     WebAPAutoScalingGroup:
       Type: AWS::AutoScaling::AutoScalingGroup
@@ -83,9 +83,9 @@
         TargetGroupARNs:
 #          - !Ref WebAPTargetGroup
           - !Ref WebAPLocalTargetGroup
-        DesiredCapacity: 0
+        DesiredCapacity: 1
         MaxSize: 1
-        MinSize: 0
+        MinSize: 1
         Tags:
           - Key: Name
             Value: webap
@@ -220,11 +220,11 @@
           - IpProtocol: tcp
             FromPort: 80
             ToPort: 80
-            SourceSecurityGroupId: !ImportValue  TestLinuxSG
+            SourceSecurityGroupId: !ImportValue  TestWinSG
           - IpProtocol: tcp
             FromPort: 80
             ToPort: 80
-            SourceSecurityGroupId: !ImportValue  TestWinSG
+            SourceSecurityGroupId: !ImportValue  TestJemeterSG
 
 
   Outputs:

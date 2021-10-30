@@ -1,0 +1,15 @@
+---
+- name: deploy jmeter-server
+  hosts: "{{ target_hosts }}"
+
+  vars:
+    ansible_user: ec2-user
+    ansible_ssh_private_key_file: /home/ec2-user/.ssh/key-performance-test.pem
+
+  become: yes
+
+  roles:
+#    - common_for_RHEL
+    - cloudwatch_agent
+    - coretto
+    - jmeter-server

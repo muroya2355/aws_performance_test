@@ -4,18 +4,18 @@
   
   Parameters:
   # ------------------------
-  # TestLinux用パラメータ
+  # TestAnsible用パラメータ
   # ------------------------
-    TestLinuxPrivateIP:
+    TestAnsiblePrivateIP:
       Type: String
       Default: 192.168.10.11
-    TestLinuxImageID:
+    TestAnsibleImageID:
       Type: AWS::SSM::Parameter::Value<String>
       Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
-    TestLinuxInstanceType:
+    TestAnsibleInstanceType:
       Type: String
       Default: t3.micro
-    KeyName:
+    TestAnsibleKeyName:
       Type: "AWS::EC2::KeyPair::KeyName"
       Default: "key-performance-test"
     FromIPSegment:
@@ -33,16 +33,32 @@
     TestWinInstanceType:
       Type: String
       Default: t3.small
+  # ------------------------
+  # TestJemeter用パラメータ
+  # ------------------------
+    TestJemeterPrivateIP:
+      Type: String
+      Default: 192.168.30.31
+    TestJemeterImageID:
+      Type: AWS::SSM::Parameter::Value<String>
+      Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+    TestJemeterInstanceType:
+      Type: String
+      Default: t3.micro
+    TestJemeterKeyName:
+      Type: "AWS::EC2::KeyPair::KeyName"
+      Default: "key-performance-test"
+
 
   Resources:
   # ------------------------
-  # TestLinux用リソース
+  # TestAnsible用リソース
   # ------------------------
-    TestLinuxSG:
+    TestAnsibleSG:
       Type: AWS::EC2::SecurityGroup
       Properties:
-        GroupName: sg_testlinux
-        GroupDescription: "SG for TestLinux"
+        GroupName: sg_testansible
+        GroupDescription: "SG for TestAnsible"
         VpcId: !ImportValue VPCID
         SecurityGroupIngress:
           - IpProtocol: tcp
@@ -50,52 +66,53 @@
             ToPort: 22
             CidrIp: !Ref FromIPSegment
 
-    TestLinuxIAMInstanceProfile:
+    TestAnsibleIAMInstanceProfile:
       Type: "AWS::IAM::InstanceProfile"
       Properties:
         Path: "/"
         Roles:
         - !ImportValue EC2IAMRole
 
-    TestLinuxInstance:
+    TestAnsibleInstance:
       Type: AWS::EC2::Instance
       Properties: 
-        ImageId: !Ref TestLinuxImageID
-        KeyName: !Ref KeyName
-        InstanceType: !Ref TestLinuxInstanceType
+        ImageId: !Ref TestAnsibleImageID
+        KeyName: !Ref TestAnsibleKeyName
+        InstanceType: !Ref TestAnsibleInstanceType
         NetworkInterfaces:
           - AssociatePublicIpAddress: "true"
             DeviceIndex: "0"
             SubnetId: !Select [0, !Split [",", !ImportValue PublicSubnetIDs]]
-            PrivateIpAddress: !Ref TestLinuxPrivateIP
+            PrivateIpAddress: !Ref TestAnsiblePrivateIP
             GroupSet:
-              - !Ref TestLinuxSG
+              - !Ref TestAnsibleSG
         BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:
             VolumeType: gp2
             VolumeSize: 8
             DeleteOnTermination: true
-        IamInstanceProfile: !Ref TestLinuxIAMInstanceProfile
+        IamInstanceProfile: !Ref TestAnsibleIAMInstanceProfile
         UserData:
           Fn::Base64: |
             #!/bin/bash
             sudo yum install -y git
             sudo yum -y install postgresql.x86_64
-            sudo amazon-linux-extras enable ansible2
-            sudo yum install -y ansible
-            sudo ansible-galaxy collection install amazon.aws
-            sudo yum install -y python3
-            pip3 install boto3
-#            sudo yum -y install python-pip
-#            pip2 install --use-feature=2020-resolver boto3 botocore
-
+            sudo amazon-linux-extras install -y python3.8
+            sudo pip3.8 install --upgrade pip
+            /usr/local/bin/pip3.8 install ansible
+            /usr/local/bin/pip3.8 install boto3 botocore
+            source .bash_profile
+#            sudo ansible-galaxy collection install amazon.aws
         Tags:
             - Key: Name
-              Value: testlinux
+              Value: test-ansible
+            - Key: Application
+              Value: ansible
+
 
   # ------------------------
-  # TestLinux用パラメータ
+  # TestAnsible用パラメータ
   # ------------------------
     TestWinSG:
       Type: AWS::EC2::SecurityGroup
@@ -107,7 +124,7 @@
           - IpProtocol: tcp
             FromPort: 3389
             ToPort: 3389
-            SourceSecurityGroupId: !Ref TestLinuxSG
+            SourceSecurityGroupId: !Ref TestAnsibleSG
 
     TestWinIAMInstanceProfile:
       Type: "AWS::IAM::InstanceProfile"
@@ -120,7 +137,7 @@
       Type: AWS::EC2::Instance
       Properties: 
         ImageId: !Ref TestWinImageID
-        KeyName: !Ref KeyName
+        KeyName: !Ref TestAnsibleKeyName
         InstanceType: !Ref TestWinInstanceType
         NetworkInterfaces:
           - DeviceIndex: "0"
@@ -137,15 +154,69 @@
         IamInstanceProfile: !Ref TestWinIAMInstanceProfile
         Tags:
             - Key: Name
-              Value: testwin
+              Value: test-win
+            - Key: Application
+              Value: windows
+
+
+  # ------------------------
+  # TestJemeter用リソース
+  # ------------------------
+    TestJemeterSG:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        GroupName: sg_testjemeter
+        GroupDescription: "SG for TestJemeter"
+        VpcId: !ImportValue VPCID
+        SecurityGroupIngress:
+          - IpProtocol: tcp
+            FromPort: 22
+            ToPort: 22
+            SourceSecurityGroupId: !Ref TestAnsibleSG
+
+    TestJemeterIAMInstanceProfile:
+      Type: "AWS::IAM::InstanceProfile"
+      Properties:
+        Path: "/"
+        Roles:
+        - !ImportValue EC2IAMRole
+
+    TestJemeterInstance:
+      Type: AWS::EC2::Instance
+      Properties: 
+        ImageId: !Ref TestJemeterImageID
+        KeyName: !Ref TestJemeterKeyName
+        InstanceType: !Ref TestJemeterInstanceType
+        NetworkInterfaces:
+          - DeviceIndex: "0"
+            SubnetId: !Select [0, !Split [",", !ImportValue PrivateSubnetIDs]]
+            PrivateIpAddress: !Ref TestJemeterPrivateIP
+            GroupSet:
+              - !Ref TestJemeterSG
+        BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeType: gp2
+            VolumeSize: 8
+            DeleteOnTermination: true
+        IamInstanceProfile: !Ref TestJemeterIAMInstanceProfile
+        Tags:
+            - Key: Name
+              Value: test-jmeter
+            - Key: Application
+              Value: jmeter-server
 
 
   Outputs:
-    TestLinuxSG:
-      Value: !Ref TestLinuxSG
+    TestAnsibleSG:
+      Value: !Ref TestAnsibleSG
       Export:
-        Name: TestLinuxSG
+        Name: TestAnsibleSG
     TestWinSG:
       Value: !Ref TestWinSG
       Export:
         Name: TestWinSG
+    TestJemeterSG:
+      Value: !Ref TestJemeterSG
+      Export:
+        Name: TestJemeterSG

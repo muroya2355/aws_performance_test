@@ -8,7 +8,7 @@ NW (performance-test-VPC)
 EC2
 	IAMロール(performance-test-IAMRole)
 	試験用EC2(performance-test-TestEC2)
-	Web/AP用EC2(performance-test-WebAPEC2ELB)
+	Web/AP用EC2(performance-test-WebAP)
 	AutoScalingGroup
 
 ELB
