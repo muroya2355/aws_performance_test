@@ -2,31 +2,43 @@
   AWSTemplateFormatVersion: '2010-09-09'
   Description: 'DB (RDS/SG)'
 
+  # ----------------
+  # DBパラメータ設定
+  # ----------------
   Parameters:
+    # インスタンスID
     DBInstanceID:
       Type: String
       Default: db
+    # データベース名
     DatabaseName:
       Type: String
       Default: tourreserve
+    # PostgreSQLバージョン
     RDSEngineVersion:
       Type: String
       Default: 12.8
+    # インスタンスタイプ
     RDSInstanceType:
       Type: String
       Default: db.t3.micro
+    # ストレージサイズ
     DBAllocatedStorage:
       Type: String
       Default: 20
+    # ストレージタイプ
     DBStorageType:
       Type: String
       Default: "gp2"
+    # マルチAZを有効化するか
     isMultiAZ:
       Type: String
       Default: false
+    # DBユーザ名
     DBUserName:
       Type: String
       Default: postgres
+    # DBユーザパスワード
     DBUserPassword:
       NoEcho: true
       Type: String
@@ -34,9 +46,46 @@
 
 
   Resources:
+
+    # DBパラメータグループ
+    DBParameterGroup:
+      Type: "AWS::RDS::DBParameterGroup"
+      Properties:
+        Family: postgres12
+        Description: DB Parameter Group
+
+    # DBを配置するサブネットグループ
+    DBSubnetGroup:
+      Type: AWS::RDS::DBSubnetGroup
+      Properties:
+        DBSubnetGroupDescription: Subnet for DB instance
+        SubnetIds:
+          - !Select [0, !Split [",", !ImportValue PrivateSubnetIDs]]
+          - !Select [1, !Split [",", !ImportValue PrivateSubnetIDs]]
+
+    # セキュリティグループ
+    DBSG:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        GroupDescription: SG for DB instance
+        VpcId: !ImportValue VPCID
+        SecurityGroupIngress:
+          # WebAPサーバからの通信許可
+          - IpProtocol: tcp
+            FromPort: 5432
+            ToPort: 5432
+            SourceSecurityGroupId: !ImportValue WebAPEC2SG
+          # 構成管理サーバからの通信許可
+          - IpProtocol: tcp
+            FromPort: 5432
+            ToPort: 5432
+            SourceSecurityGroupId: !ImportValue TestAnsibleSG
+
+    # DBサーバ
     DB:
       Type: AWS::RDS::DBInstance
       Properties:
+        # インスタンス設定
         DBInstanceIdentifier: !Ref DBInstanceID
         DBName: !Ref DatabaseName
         Engine: postgres
@@ -47,44 +96,21 @@
         StorageType: !Ref DBStorageType
         MasterUsername: !Ref DBUserName
         MasterUserPassword: !Ref DBUserPassword
+        # パラメータグループ
         DBParameterGroupName: !Ref DBParameterGroup
+        # セキュリティグループ
         VPCSecurityGroups:
           - !Ref DBSG
+        # サブネットグループ
         DBSubnetGroupName: !Ref DBSubnetGroup
+        # タグ設定
         Tags:
           - Key: Name
             Value: pgdb
 
-    DBParameterGroup:
-      Type: "AWS::RDS::DBParameterGroup"
-      Properties:
-        Family: postgres12
-        Description: DB Parameter Group
-
-    DBSG:
-      Type: AWS::EC2::SecurityGroup
-      Properties:
-        GroupDescription: SG for DB instance
-        VpcId: !ImportValue VPCID
-        SecurityGroupIngress:
-          - IpProtocol: tcp
-            FromPort: 5432
-            ToPort: 5432
-            SourceSecurityGroupId: !ImportValue WebAPEC2SG
-          - IpProtocol: tcp
-            FromPort: 5432
-            ToPort: 5432
-            SourceSecurityGroupId: !ImportValue TestAnsibleSG
-
-    DBSubnetGroup:
-      Type: AWS::RDS::DBSubnetGroup
-      Properties:
-        DBSubnetGroupDescription: Subnet for DB instance
-        SubnetIds:
-          - !Select [0, !Split [",", !ImportValue PrivateSubnetIDs]]
-          - !Select [1, !Split [",", !ImportValue PrivateSubnetIDs]]
-
-
+  # ----------------
+  # パラメータ出力
+  # ----------------
   Outputs:
     DBInstanceID:
       Value: !Ref DB

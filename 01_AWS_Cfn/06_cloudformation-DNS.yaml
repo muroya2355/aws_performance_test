@@ -2,12 +2,16 @@
   AWSTemplateFormatVersion: '2010-09-09'
   Description: 'DNS'
 
+  # ----------------
+  # DNSパラメータ設定
+  # ----------------
   Parameters:
     PrivateHostedZoneName:
       Type: String
       Default: tourreserve.com
 
   Resources:
+    # プライベートホストゾーン設定
     PrivateHostedZone:
       Type: AWS::Route53::HostedZone
       Properties:
@@ -19,6 +23,7 @@
             VPCRegion:
               Fn::Sub: "${AWS::Region}"
 
+    # 内部ELB用Aレコード
     LocalELBDNSRecordSet:
       DependsOn: PrivateHostedZone
       Type: AWS::Route53::RecordSet
@@ -30,6 +35,7 @@
           HostedZoneId: !ImportValue WebAPLocalALBID
           DNSName: !ImportValue WebAPLocalALBDNS
 
+    # DB用CNAMEレコード
     DBDNSRecordSet:
       DependsOn: PrivateHostedZone
       Type: AWS::Route53::RecordSet

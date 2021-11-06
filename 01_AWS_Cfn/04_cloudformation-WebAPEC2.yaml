@@ -2,6 +2,9 @@
   AWSTemplateFormatVersion: '2010-09-09'
   Description: 'WebAP EC2/ASG'
 
+  # ------------------------
+  # WebAPサーバ用パラメータ
+  # ------------------------
   Parameters:
     EC2ImageID:
       Type: AWS::SSM::Parameter::Value<String>
@@ -15,46 +18,12 @@
     NumberOfServers:
       Type: String
       Default: 1
-#    FromIPSegment:
-#      Type: String
-#      Default: XXX.XXX.XXX.XXX/32
 
   Resources:
-  # ---------------------------------------------------------------
-  # Web/APサーバ用EC2 (EC2起動設定/ASG/IAMロール/セキュリティグループ)
-  # ---------------------------------------------------------------
-    WebAPLaunchTemplate:
-      Type: AWS::EC2::LaunchTemplate
-      Properties:
-        LaunchTemplateName: WebAPLaunchTemplate
-        LaunchTemplateData:
-          ImageId: !Ref EC2ImageID
-          KeyName: !Ref KeyName
-          InstanceType: !Ref EC2InstanceType
-          NetworkInterfaces:
-          - AssociatePublicIpAddress: "false"
-            DeviceIndex: "0"
-            Groups:
-              - !Ref WebAPEC2SG
-          IamInstanceProfile:
-            Arn: !GetAtt
-              - WebAPEC2IAMInstanceProfile
-              - Arn
-          Monitoring:
-            Enabled: true
-          TagSpecifications:
-          - ResourceType: instance
-            Tags:
-            - Key: Name
-              Value: webap-launchsetting
-
-    WebAPEC2IAMInstanceProfile:
-      Type: "AWS::IAM::InstanceProfile"
-      Properties:
-        Path: "/"
-        Roles:
-        - !ImportValue EC2IAMRole
-
+  # ------------------------
+  # Web/APサーバ用
+  # ------------------------
+    # セキュリティグループ
     WebAPEC2SG:
       Type: AWS::EC2::SecurityGroup
       Properties:
@@ -62,35 +31,77 @@
         GroupDescription: "SG for WebAPEC2"
         VpcId: !ImportValue VPCID
         SecurityGroupIngress:
-#          - IpProtocol: tcp
-#            FromPort: 80
-#            ToPort: 80
-#            SourceSecurityGroupId: !Ref WebAPInternetALBSG
+          # 内部ELBからの接続許可
           - IpProtocol: tcp
             FromPort: 80
             ToPort: 80
             SourceSecurityGroupId: !Ref WebAPLocalALBSG
+          # 構成管理サーバからの接続許可
           - IpProtocol: tcp
             FromPort: 22
             ToPort: 22
             SourceSecurityGroupId: !ImportValue TestAnsibleSG
 
+    # IAMロールからインスタンスプロファイルの設定
+    WebAPEC2IAMInstanceProfile:
+      Type: "AWS::IAM::InstanceProfile"
+      Properties:
+        Path: "/"
+        Roles:
+        - !ImportValue EC2IAMRole
+
+    # EC2インスタンス起動設定
+    WebAPLaunchTemplate:
+      Type: AWS::EC2::LaunchTemplate
+      Properties:
+        LaunchTemplateName: WebAPLaunchTemplate
+        LaunchTemplateData:
+          # 基本設定
+          ImageId: !Ref EC2ImageID
+          KeyName: !Ref KeyName
+          InstanceType: !Ref EC2InstanceType
+          # ネットワーク設定
+          NetworkInterfaces:
+          - AssociatePublicIpAddress: "false"
+            DeviceIndex: "0"
+            Groups:
+              - !Ref WebAPEC2SG
+          # IAMロールをインスタンスにアタッチ
+          IamInstanceProfile:
+            Arn: !GetAtt
+              - WebAPEC2IAMInstanceProfile
+              - Arn
+          # 拡張モニタリングを有効化
+          Monitoring:
+            Enabled: true
+          # タグ設定
+          TagSpecifications:
+          - ResourceType: instance
+            Tags:
+            - Key: Name
+              Value: webap-launchsetting
+
+    # ASG
     WebAPAutoScalingGroup:
       Type: AWS::AutoScaling::AutoScalingGroup
       Properties:
         AutoScalingGroupName: WebAPAutoScalingGroup
+        # サブネット設定(AZ-A/AZ-Cのプライベートサブネット)
         VPCZoneIdentifier:
           - !Select [0, !Split [",", !ImportValue PrivateSubnetIDs]]
           - !Select [1, !Split [",", !ImportValue PrivateSubnetIDs]]
+        # EC2起動設定を指定
         LaunchTemplate:
           LaunchTemplateId: !Ref WebAPLaunchTemplate
           Version: !GetAtt WebAPLaunchTemplate.LatestVersionNumber
+        # 内部ELBのターゲットグループに登録
         TargetGroupARNs:
-#          - !Ref WebAPTargetGroup
           - !Ref WebAPLocalTargetGroup
+        # サーバ台数設定(1台)
         DesiredCapacity: !Ref NumberOfServers
         MaxSize: !Ref NumberOfServers
         MinSize: !Ref NumberOfServers
+        # タグ設定
         Tags:
           - Key: Name
             Value: webap
@@ -99,81 +110,39 @@
             Value: tour-reservation
             PropagateAtLaunch: true
 
-#  # ---------------------------------------------------------------
-#  # インターネット向けELB (TargetGroup/外部ALB/リスナー/SG)
-#  # ---------------------------------------------------------------
-#    WebAPTargetGroup: 
-#      Type: "AWS::ElasticLoadBalancingV2::TargetGroup"
-#      Properties: 
-#        VpcId: !ImportValue VPCID
-#        Name: WebAPTargetGroup
-#        Protocol: HTTP
-#        Port: 80
-#        HealthCheckProtocol: HTTP
-#        HealthCheckPath: "/"
-#        HealthCheckPort: "traffic-port"
-#        HealthyThresholdCount: 5
-#        UnhealthyThresholdCount: 2
-#        HealthCheckTimeoutSeconds: 5
-#        HealthCheckIntervalSeconds: 10
-#        Matcher: 
-#          HttpCode: 200
-#        Tags: 
-#          - Key: Name
-#            Value: webap-targetgroup
-#
-#    WebAPInternetALB:
-#      Type: "AWS::ElasticLoadBalancingV2::LoadBalancer"
-#      Properties: 
-#        Name: WebAPInternetALB
-#        Tags: 
-#          - Key: Name
-#            Value: webapelb-internet
-#        Scheme: "internet-facing"
-#        LoadBalancerAttributes:
-#          - Key: "deletion_protection.enabled"
-#            Value: false
-#          - Key: "idle_timeout.timeout_seconds"
-#            Value: 60
-#        SecurityGroups:
-#          - !Ref WebAPInternetALBSG
-#        Subnets: 
-#          - !Select [0, !Split [",", !ImportValue PublicSubnetIDs]]
-#          - !Select [1, !Split [",", !ImportValue PublicSubnetIDs]]
-#
-#    WebAPInternetALBListener: 
-#      Type: "AWS::ElasticLoadBalancingV2::Listener"
-#      Properties: 
-#        DefaultActions:
-#          - TargetGroupArn: !Ref WebAPTargetGroup
-#            Type: forward
-#        LoadBalancerArn: !Ref WebAPInternetALB
-#        Port: 80
-#        Protocol: HTTP
-#
-#    WebAPInternetALBSG:
-#      Type: AWS::EC2::SecurityGroup
-#      Properties:
-#        GroupName: sg_webapalb-internet
-#        GroupDescription: "SG for WebAPInternetALB"
-#        VpcId: !ImportValue VPCID
-#        SecurityGroupIngress:
-#          - IpProtocol: tcp
-#            FromPort: 80
-#            ToPort: 80
-#            CidrIp: !Ref FromIPSegment
+  # ------------------------
+  # 内部ELB
+  # ------------------------
 
+    # セキュリティグループ
+    WebAPLocalALBSG:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        GroupName: sg_webapalb-local
+        GroupDescription: "SG for WebAPLocalALB"
+        VpcId: !ImportValue VPCID
+        SecurityGroupIngress:
+          # JMeterクライアントからの通信許可
+          - IpProtocol: tcp
+            FromPort: 80
+            ToPort: 80
+            SourceSecurityGroupId: !ImportValue  TestWinSG
+          # JMeterサーバからの通信許可
+          - IpProtocol: tcp
+            FromPort: 80
+            ToPort: 80
+            SourceSecurityGroupId: !ImportValue  TestJemeterSG
 
-  # ---------------------------------------------------------------
-  # 内部ELB (TargetGroup/外部ALB/リスナー/SG)
-  # ---------------------------------------------------------------
+    # ターゲットグループ
     WebAPLocalTargetGroup: 
       Type: "AWS::ElasticLoadBalancingV2::TargetGroup"
       Properties: 
         VpcId: !ImportValue VPCID
         Name: WebAPLocalTargetGroup
+        # 振分け先ポート(HTTP:80)
         Protocol: HTTP
         Port: 80
+        # ヘルスチェック設定
         HealthCheckProtocol: HTTP
         HealthCheckPath: "/"
         HealthCheckPort: "traffic-port"
@@ -186,6 +155,7 @@
         Tags: 
           - Key: Name
 
+    # 内部ELB
     WebAPLocalALB:
       Type: "AWS::ElasticLoadBalancingV2::LoadBalancer"
       Properties: 
@@ -205,33 +175,22 @@
           - !Select [0, !Split [",", !ImportValue PrivateSubnetIDs]]
           - !Select [1, !Split [",", !ImportValue PrivateSubnetIDs]]
 
+    # ELBリスナー設定
     WebAPLocalALBListener: 
       Type: "AWS::ElasticLoadBalancingV2::Listener"
       Properties: 
         DefaultActions:
+          # ターゲットグループ設定
           - TargetGroupArn: !Ref WebAPLocalTargetGroup
             Type: forward
         LoadBalancerArn: !Ref WebAPLocalALB
+        # 受付ポート(HTTP:80)
         Port: 80
         Protocol: HTTP
 
-    WebAPLocalALBSG:
-      Type: AWS::EC2::SecurityGroup
-      Properties:
-        GroupName: sg_webapalb-local
-        GroupDescription: "SG for WebAPLocalALB"
-        VpcId: !ImportValue VPCID
-        SecurityGroupIngress:
-          - IpProtocol: tcp
-            FromPort: 80
-            ToPort: 80
-            SourceSecurityGroupId: !ImportValue  TestWinSG
-          - IpProtocol: tcp
-            FromPort: 80
-            ToPort: 80
-            SourceSecurityGroupId: !ImportValue  TestJemeterSG
-
-
+  # ------------------------
+  # リソースID出力
+  # ------------------------
   Outputs:
     WebAPEC2SG:
       Value: !Ref WebAPEC2SG
