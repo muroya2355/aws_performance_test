@@ -1,4 +1,4 @@
-# [実践] JMeterを使ったAWS環境Webアプリケーションの性能検証①
+# [実践] JMeterを使ってAWS環境Webアプリケーションを性能検証する①
 
 システムパフォーマンスの本を読んで、自分も検証してみたい！と思ったけど、環境構築が手間で諦めた。。。という人、多いと思います。
 
@@ -11,7 +11,7 @@
 * 本システムは、構成管理兼踏み台、負荷掛け、Web3層の3つのパートからなります。
 * AWSの構成管理には CloudFormation を、各サーバのミドルウェアの管理には Ansible を使用します。
 * Webアプリへの負荷掛けは JMeter サーバ/クライアントを通して行います。
-* Webサーバには Apache httpd と Tomcat、アプリケーションは TERASOLUNAサンプルアプリケーションを使用します。https://github.com/terasolunaorg/terasoluna-tourreservation
+* Webサーバには Apache httpd と Tomcat、アプリケーションは [TERASOLUNAサンプルアプリケーション](https://github.com/terasolunaorg/terasoluna-tourreservation)を使用します。
 * DBエンジンは PostgreSQL を採用します。
 
 # 目次
@@ -26,7 +26,7 @@
 ## ②環境構築（1）AWS編
 * CloudFormation を用いて、ELB + EC2 + RDS のオーソドックスな AWS システムを構築します。AWS構成図は以下になります。
 
-<img width=70% alt="システム概要図" src="./00_docs/.figure/AWS構成.png">
+<img width=80% alt="システム概要図" src="./00_docs/.figure/AWS構成.png">
 
 ## ③環境構築（2）Ansible編
 * 構成管理サーバの Ansible を用いて、各サーバをプロビジョニングしていきます。ソフトウェア構成図は以下。

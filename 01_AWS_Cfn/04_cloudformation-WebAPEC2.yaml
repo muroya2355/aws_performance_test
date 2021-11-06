@@ -12,6 +12,9 @@
     EC2InstanceType:
       Type: String
       Default: t3.micro
+    NumberOfServers:
+      Type: String
+      Default: 1
 #    FromIPSegment:
 #      Type: String
 #      Default: XXX.XXX.XXX.XXX/32
@@ -85,9 +88,9 @@
         TargetGroupARNs:
 #          - !Ref WebAPTargetGroup
           - !Ref WebAPLocalTargetGroup
-        DesiredCapacity: 1
-        MaxSize: 1
-        MinSize: 1
+        DesiredCapacity: !Ref NumberOfServers
+        MaxSize: !Ref NumberOfServers
+        MinSize: !Ref NumberOfServers
         Tags:
           - Key: Name
             Value: webap

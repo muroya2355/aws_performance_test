@@ -2,10 +2,16 @@
   AWSTemplateFormatVersion: '2010-09-09'
   Description: 'VPC/Subnet/RTB/IGW/NAT-GW'
   
+  # ------------------------
+  # パラメータ定義：VPC/サブネットのNWセグメント
+  # ------------------------
   Parameters:
+  # VPCセグメント
     VpcBlock:
       Type: String
       Default: 192.168.0.0/16
+
+  # 各サブネットのセグメント
     PublicSubnet01Block:
       Type: String
       Default: 192.168.10.0/24
@@ -19,20 +25,11 @@
       Type: String
       Default: 192.168.40.0/24  
 
-  Metadata:
-    AWS::CloudFormation::Interface:
-      ParameterGroups:
-        -
-          Label:
-            default: "Network Configuration"
-          Parameters:
-            - VpcBlock
-            - PublicSubnet01Block
-            - PublicSubnet02Block
-            - PrivateSubnet01Block
-            - PrivateSubnet02Block
   
   Resources:
+  # ------------------------
+  # VPC定義
+  # ------------------------
     VPC:
       Type: AWS::EC2::VPC
       Properties:
@@ -43,6 +40,10 @@
         - Key: Name
           Value: !Sub '${AWS::StackName}'
 
+  # ------------------------
+  # サブネット定義
+  # ------------------------
+    # AZ-Aパブリックサブネット
     PublicSubnet01:
       Type: AWS::EC2::Subnet
       Metadata:
@@ -61,6 +62,7 @@
         - Key: Name
           Value: !Sub "${AWS::StackName}-PublicSubnet01"
 
+    # AZ-Cパブリックサブネット
     PublicSubnet02:
       Type: AWS::EC2::Subnet
       Metadata:
@@ -79,6 +81,7 @@
         - Key: Name
           Value: !Sub "${AWS::StackName}-PublicSubnet02"
 
+    # AZ-Aプライベートサブネット
     PrivateSubnet01:
       Type: AWS::EC2::Subnet
       Metadata:
@@ -96,7 +99,8 @@
         Tags:
         - Key: Name
           Value: !Sub "${AWS::StackName}-PrivateSubnet01"
-        
+    
+    # AZ-Cプライベートサブネット
     PrivateSubnet02:
       Type: AWS::EC2::Subnet
       Metadata:
@@ -115,6 +119,10 @@
         - Key: Name
           Value: !Sub "${AWS::StackName}-PrivateSubnet02"
 
+  # ------------------------
+  # インターネットGW/NAT-GW定義
+  # ------------------------
+    # インターネットGW
     InternetGateway:
       Type: "AWS::EC2::InternetGateway"
       Properties:
@@ -122,19 +130,20 @@
         - Key: Name
           Value: !Sub "${AWS::StackName}"
 
+    # インターネットGWをVPCにアタッチ
     VPCGatewayAttachment:
       Type: "AWS::EC2::VPCGatewayAttachment"
       Properties:
         InternetGatewayId: !Ref InternetGateway
         VpcId: !Ref VPC
 
+    # NAT-GW用のEIP
     NatGatewayEIP:
-      DependsOn:
-      - VPCGatewayAttachment
       Type: 'AWS::EC2::EIP'
       Properties:
         Domain: vpc
 
+    # NAT-GW
     NatGateway:
       DependsOn:
       - NatGatewayEIP
@@ -147,6 +156,10 @@
         - Key: Name
           Value: !Sub '${AWS::StackName}-NATGW-AZ-A'
 
+  # ------------------------
+  # 各サブネットのルートテーブル定義
+  # ------------------------
+    # パブリックルートテーブル定義
     PublicRouteTable:
       Type: AWS::EC2::RouteTable
       Properties:
@@ -157,6 +170,7 @@
         - Key: Network
           Value: Public
 
+    # パブリックRTBのルーティング情報
     PublicRoute:
       DependsOn: VPCGatewayAttachment
       Type: AWS::EC2::Route
@@ -165,6 +179,7 @@
         DestinationCidrBlock: 0.0.0.0/0
         GatewayId: !Ref InternetGateway
 
+    # プライベートルートテーブル定義
     PrivateRouteTable:
       Type: AWS::EC2::RouteTable
       Properties:
@@ -175,6 +190,7 @@
         - Key: Network
           Value: Private
 
+    # プライベートRTBのルーティング情報
     PrivateRoute:
       DependsOn:
       - NatGateway
@@ -184,6 +200,7 @@
         DestinationCidrBlock: 0.0.0.0/0
         NatGatewayId: !Ref NatGateway
 
+    # 各ルートテーブルをサブネットにアタッチ
     PublicSubnet01RouteTableAssociation:
       Type: AWS::EC2::SubnetRouteTableAssociation
       Properties:
@@ -208,22 +225,28 @@
         SubnetId: !Ref PrivateSubnet02
         RouteTableId: !Ref PrivateRouteTable
 
+  # ------------------------
+  # リソースID出力
+  # ------------------------
   Outputs:
+    # VPCのID
+    VPCID:
+      Description: The VPC Id
+      Value: !Ref VPC
+      Export:
+        Name: VPCID
+
+    # パブリックサブネットのID
     PublicSubnetIDs:
       Description: Public Subnet IDs in the VPC
       Value: !Join [ ",", [ !Ref PublicSubnet01, !Ref PublicSubnet02 ] ]
       Export:
         Name: PublicSubnetIDs
 
+    # プライベートサブネットのID
     PrivateSubnetIDs:
       Description: Private Subnet IDs in the VPC
       Value: !Join [ ",", [ !Ref PrivateSubnet01, !Ref PrivateSubnet02 ] ]
       Export:
         Name: PrivateSubnetIDs
-
-    VPCID:
-      Description: The VPC Id
-      Value: !Ref VPC
-      Export:
-        Name: VPCID
   
