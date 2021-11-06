@@ -16,12 +16,12 @@
 
 インターネット向け ALB を使用した場合、作業用PC の JMeter から大量のアクセスをする場合、 作業用PC側のネットワーク回線がボトルネックとなる可能性があります。
 
-<img width=80% alt="システム概要図" src="./.figure/01_AWS/1001.png">
+<img width=60% alt="システム概要図" src="./.figure/01_AWS/1001.png">
 
 しかし、実際にシステムが使われる場合、複数の端末からアクセスされるため、ネットワーク回線がボトルネックになることはありません。
 
 
-<img width=80% alt="システム概要図" src="./.figure/01_AWS/1002.png">
+<img width=60% alt="システム概要図" src="./.figure/01_AWS/1002.png">
 
 性能試験では、AWS環境内に JMeterサーバを導入し、かつ内部 ALB を使用することにより回線のボトルネックが起きないようにしています。
 
@@ -34,7 +34,7 @@ EC2 コンソールからキーペアを作成していきます。
 https://docs.aws.amazon.com/ja_jp/AWSEC2/latest/UserGuide/ec2-key-pairs.html
 
 形式は pem で、名前は「key-performance-test」で作成してください。
-<img width=100% alt="システム概要図" src="./.figure/01_AWS/1003.png">
+<img width=80% alt="システム概要図" src="./.figure/01_AWS/1003.png">
 
 ## CloudFormation のスタック作成
 
@@ -59,7 +59,7 @@ https://qiita.com/mshinoda88/items/c5b238212c2de850efdd#5-cloudformation%E5%AE%9
 
 ただし、スタック「performance-test-TestEC2」を作成する際、パラメータ「FromIPSegment」が未定になっています。これは作業PCのグローバルIPアドレス（ルータ、プロキシサーバ等のアドレス）を指定してください。家庭用ルータを使用している場合は、IPアドレスがこまめに変更されるので、こまめにスタックを更新してください。
 
-<img width=100% alt="システム概要図" src="./.figure/01_AWS/1004.png">
+<img width=80% alt="システム概要図" src="./.figure/01_AWS/1004.png">
 
 ## 動作確認
 
@@ -67,8 +67,12 @@ https://qiita.com/mshinoda88/items/c5b238212c2de850efdd#5-cloudformation%E5%AE%9
 
 ## VPC 関連
 
-<img width=80% alt="システム概要図" src="./.figure/01_AWS/1005.png">
+<img width=60% alt="システム概要図" src="./.figure/01_AWS/1005.png">
 
 ```01_cloudformation-network.yaml
 puts 'The best way to log and share programmers knowledge.'
 ```
+
+## 試験用 EC2
+
+<img width=40% alt="システム概要図" src="./.figure/01_AWS/1006.png">
