@@ -34,12 +34,12 @@ AWS 構成図は以下となります。
 
 インターネット向け ALB を使用した場合、作業用PC の JMeter から大量のアクセスをする場合、 作業用PC側のネットワーク回線がボトルネックとなる可能性があります。
 
-<img width=60% alt="システム概要図" src="./.figure/01_AWS/1001.png">
+<img width=80% alt="システム概要図" src="./.figure/01_AWS/1001.png">
 
 しかし、実際にシステムが使われる場合、複数の端末からアクセスされるため、ネットワーク回線がボトルネックになることはありません。
 
 
-<img width=60% alt="システム概要図" src="./.figure/01_AWS/1002.png">
+<img width=80% alt="システム概要図" src="./.figure/01_AWS/1002.png">
 
 性能試験では、AWS環境内に JMeterサーバを導入し、かつ内部 ALB を使用することにより回線のボトルネックが起きないようにしています。
 
@@ -109,11 +109,9 @@ TereTerm で構成管理サーバに接続したままポート転送を設定�
 
 https://dev.classmethod.jp/articles/rdp-via-bastion-server/
 
-<img width=30% alt="システム概要図" src="./.figure/01_AWS/1010.png">
-
+<img width=40% alt="システム概要図" src="./.figure/01_AWS/1010.png">
 <img width=30% alt="システム概要図" src="./.figure/01_AWS/1011.png">
-
-<img width=20% alt="システム概要図" src="./.figure/01_AWS/1012.png">
+<img width=25% alt="システム概要図" src="./.figure/01_AWS/1012.png">
 
 ### JMeter サーバ
 
@@ -151,7 +149,7 @@ tourreserve=> \q
 
 まずは、VPC、サブネット、インターネットGWと NAT-GW、ルートテーブルを作成しましょう。
 
-<img width=60% alt="システム概要図" src="./.figure/01_AWS/1005.png">
+<img width=80% alt="システム概要図" src="./.figure/01_AWS/1005.png">
 
 <details><summary>CloudFormation コード（クリックして展開）</summary><div>
 
@@ -496,7 +494,7 @@ EC2 インスタンスにアタッチする IAM ロールを作成します。
 
 また、各サーバのセキュリティグループを作成し、通信許可設定を行います。
 
-<img width=40% alt="システム概要図" src="./.figure/01_AWS/1006.png">
+<img width=80% alt="システム概要図" src="./.figure/01_AWS/1006.png">
 
 |サーバ|インスタンス名|OS|ユーザデータ内容|接続元|
 |-|-|-|-|-|
@@ -872,7 +870,7 @@ WebAPサーバは先ほどの試験用 EC2 とは違い、EC2インスタンス�
 
 また、ASG を ELB のターゲットグループに登録し、ELB への通信リクエストが WebAP サーバに振り分けられるようにします。
 
-<img width=60% alt="システム概要図" src="./.figure/01_AWS/1007.png">
+<img width=80% alt="システム概要図" src="./.figure/01_AWS/1007.png">
 
 <details><summary>CloudFormation コード（クリックして展開）</summary><div>
 
@@ -1100,7 +1098,7 @@ WebAPサーバは先ほどの試験用 EC2 とは違い、EC2インスタンス�
 
 TERASOLUNA アプリケーションで使うデータベースも作成します。
 
-<img width=30% alt="システム概要図" src="./.figure/01_AWS/1008.png">
+<img width=80% alt="システム概要図" src="./.figure/01_AWS/1008.png">
 
 |パラメータ|値|
 |-|-|
@@ -1248,6 +1246,8 @@ TERASOLUNA アプリケーションで使うデータベースも作成します
 VPC 内のみ有効なプライベートホストゾーン「tourreserve.com」を作成します。
 
 また、ホストゾーン内に以下の DNS レコードを作成します。
+
+<img width=80% alt="システム概要図" src="./.figure/01_AWS/1013.png">
 
 |FQDN|レコード区分|名前解決先|
 |-|-|-|

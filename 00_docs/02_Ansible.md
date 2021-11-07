@@ -245,7 +245,100 @@ JMeter クライアントに RDP 接続して、Internet Explorer を開いて�
 	* 登録完了画面が表示され、「お客様の会員IDは 00000012」と出てくればOK
 	* 会員ID「00000012」でログインできるようになります。
 
+
+
+
+
 # Ansible コードの解説
 
+## ダイナミックインベントリ
+
+Ansible の実行対象を記述するインベントリファイルは、本来、対象サーバの IP アドレスを記述していきます。
+
+```
+[tag_ansible]
+localhost
+[tag_jmeter_server]
+192.168.30.31
+[tag_tour_reservation]
+192.168.40.180          ← 動的に変化
+[tag_windows]
+192.168.30.21
+```
+
+しかし、EC2 の IPアドレス（今回はWebAPサーバ）は動的に変化するため、この方法では都度インベントリを書き直す必要があります。この手間を省くための仕組みが、ダイナミックインベントリです。
+
+こちらのサイトを参考にしました。
+
+https://zenn.dev/ohsawa0515/articles/enable-ec2-dynamic-inventory-by-ansible
+
+EC2インスタンス作成時に、Application タグを付与しています。
+
+|サーバ|Nameタグ|Applicationタグ|
+|-|-|-|
+|構成管理サーバ|test-ansible|ansible|
+|JMeterクライアント|test-win|windows|
+|JMeterサーバ|test-jmeter|jmeter_server|
+|WebAPサーバ|webap|tour_reservation|
+
+このタググループ毎に、playbook を適用していきます。
+
+まずは必要パッケージをインストール。
+
+```sh:構成管理サーバ
+/usr/local/bin/pip3.8 install boto3 botocore
+```
+
+インベントリファイルを記述していきます。
+
+```yaml:inventory_aws_ec2.yaml
 
 
+```
+
+
+## CloudWatch Agent
+
+### tasks/main.yml
+
+### 設定ファイル
+
+## Amazon Corretto
+
+### tasks/main.yml
+
+## Maven
+
+### tasks/main.yml
+
+## アプリケーションビルド
+
+### tasks/main.yml
+
+## JMeter クライアント（Windows設定全般）
+
+### tasks/main.yml
+
+### 設定ファイル
+
+## JMeter サーバ
+
+### tasks/main.yml
+
+### 設定ファイル
+
+## Apache httpd
+
+### tasks/main.yml
+
+### 設定ファイル
+
+## Tomcat
+
+### tasks/main.yml
+
+### 設定ファイル
+
+## アプリケーションのデプロイ
+
+### tasks/main.yml
