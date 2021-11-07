@@ -162,10 +162,90 @@ test-win                   : ok=7    changed=6    unreachable=0    failed=0    s
 次は JMeter サーバです。
 
 ```sh:構成管理サーバ
+$ ansible-playbook -i inventory_aws_ec2.yaml test-jmeter-server.yaml -e "target_hosts=tag_jmeter_server"
 
+PLAY [deploy webservers] *******************************************************
+
+TASK [Gathering Facts] *********************************************************
+
+(中略)
+
+TASK [jmeter-server : サービスの起動] ******************************************
+changed: [test-jmeter]
+
+PLAY RECAP *********************************************************************
+test-jmeter                : ok=20   changed=17   unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 ```
 
 ### WebAP サーバ
 
+最後に WebAP サーバに対して Playbook 実行します。
+
+```sh:構成管理サーバ
+$ ansible-playbook -i inventory_aws_ec2.yaml webap.yaml -e "target_hosts=tag_tour_reservation"
+
+PLAY [deploy webservers] *******************************************************
+
+(中略)
+
+TASK [deploy_ap : warファイルを取得] *******************************************
+changed: [webap]
+
+PLAY RECAP *********************************************************************
+webap                      : ok=32   changed=29   unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+```
 
 ## アプリケーション動作確認
+
+JMeter クライアントに RDP 接続して、Internet Explorer を開いてください。
+
+アドレスバーに ``http://local.www.tourreserve.com/terasoluna-tourreservation-web/`` を入力してアクセスします。
+
+途中、警告画面が出るので、サイトを例外に追加してください。
+
+<img width=30% alt="ソフトウェア概要図" src="./.figure/02_Ansible/2001.png"> <img width=30% alt="ソフトウェア概要図" src="./.figure/02_Ansible/2002.png"> <img width=30% alt="ソフトウェア概要図" src="./.figure/02_Ansible/2003.png">
+
+トップページが表示されたらOKです。右下の「日本語」ボタンを押して日本語表記にしてください。
+
+<img width=40% alt="ソフトウェア概要図" src="./.figure/02_Ansible/2004.png"> <img width=40% alt="ソフトウェア概要図" src="./.figure/02_Ansible/2005.png">
+
+各メニューの動作確認をしてみましょう。
+
+* ツアー検索
+	* 「ツアー検索する」ボタンをクリック
+	* 以下の条件で検索
+		* 出発日：そのまま
+		* 日数：制限なし
+		* 出発地：北海道
+		* 目的地：北海道
+		* 人数：大人 1 人、子供 1 人
+		* 基本料金：上限なし
+	* ツアーが表示されればOK
+
+* ログイン
+	* 「ログインする」ボタンをクリック
+	* 以下の情報でログイン
+		* 会員ID：00000000
+		* パスワード：password
+	* ユーザのメニュー画面が表示されればOK
+
+* 顧客登録
+	* 「顧客登録する」ボタンをクリック
+	* 以下の情報で登録
+		* フリガナ：シケンロクロウ
+		* 氏名：試験六郎
+		* 誕生日：1980年1月1日
+		* 職業：営業
+		* Eメール：data6@example.com
+		* 電話番号：123-1234-1234
+		* 郵便番号：135-8671
+		* 住所：東京都江東区豊洲3-3-9
+		* パスワード：password
+	* 確認画面が表示されるので、そのまま登録
+	* 登録完了画面が表示され、「お客様の会員IDは 00000012」と出てくればOK
+	* 会員ID「00000012」でログインできるようになります。
+
+# Ansible コードの解説
+
+
+
