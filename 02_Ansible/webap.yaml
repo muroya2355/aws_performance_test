@@ -9,10 +9,8 @@
   become: yes
 
   roles:
-#    - common_for_RHEL
     - cloudwatch_agent
     - httpd
-#    - openjdk
-    - coretto
+    - corretto
     - tomcat
     - deploy_ap

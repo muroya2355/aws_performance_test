@@ -85,11 +85,87 @@ $ ansible-inventory -i inventory_aws_ec2.yaml --graph
   |--@ungrouped:
 ```
 
-
-
 ## Playbook 実行
 
+各サーバに対して Playbook を実行していきます。
 
+### 構成管理サーバ
+
+まずは構成管理サーバ自身から。
+
+```sh:構成管理サーバ
+$ ansible-playbook test-ansible.yaml
+[WARNING]: No inventory was parsed, only implicit localhost is available
+[WARNING]: provided hosts list is empty, only localhost is available. Note that
+the implicit localhost does not match 'all'
+
+PLAY [deploy testservers] ******************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [localhost]
+
+TASK [cloudwatch_agent : cloudwatch agent のインストール] **********************
+changed: [localhost]
+
+(中略)
+
+TASK [build_ap : アプリケーションのビルド] *************************************
+changed: [localhost]
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=26   changed=22   unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+```
+
+### JMeter クライアント
+
+JMeter クライアントは Windows のため、鍵認証でなくパスワード認証でログインします。
+
+test-jmeter-client.yaml を編集し、Administrator のパスワードを書いてください。
+
+```yaml:test-jmeter-client.yaml
+---
+- name: deploy jmeter-server
+  hosts: "{{ target_hosts }}"
+
+  vars:
+    ansible_user: Administrator
+    ansible_password: "xxxxxx"  ← ここにパスワードを記入
+    ansible_connection: winrm
+    ansible_port: 5986
+    ansible_winrm_server_cert_validation: ignore
+
+  roles:
+    - jmeter-client
+```
+
+編集後、Playbook を実行します。
+
+```sh:構成管理サーバ
+$ ansible-playbook -i inventory_aws_ec2.yaml test-jmeter-client.yaml -e "target_hosts=tag_windows"
+PLAY [deploy jmeter-server] ****************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [test-win]
+
+TASK [jmeter-client : Windows ファイアウォールの無効化] ************************
+changed: [test-win]
+
+(中略)
+
+
+PLAY RECAP *********************************************************************
+test-win                   : ok=7    changed=6    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+```
+
+### JMeter サーバ
+
+次は JMeter サーバです。
+
+```sh:構成管理サーバ
+
+```
+
+### WebAP サーバ
 
 
 ## アプリケーション動作確認
