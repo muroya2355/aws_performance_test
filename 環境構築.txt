@@ -26,6 +26,8 @@ DNS(performance-test-DNS)
 
 ansible-inventory -i inventory_aws_ec2.yaml --graph
 
+ansible-inventory -i inventory_aws_ec2.yaml playbook-test.yaml
+
 ansible-playbook test-ansible.yaml
 ansible-playbook -i inventory_aws_ec2.yaml test-jmeter-client.yaml -e "target_hosts=tag_windows"
 ansible-playbook -i inventory_aws_ec2.yaml test-jmeter-server.yaml -e "target_hosts=tag_jmeter_server"

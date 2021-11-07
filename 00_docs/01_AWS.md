@@ -8,7 +8,23 @@
 
 # AWS構成
 
+## システム概要図
+
+まずは本システムのおさらいです。
+
+<img width=80% alt="システム概要図" src="./.figure/システム概要.png">
+
+* 本システムは、構成管理兼踏み台、負荷掛け、Web3層の3つのパートからなります。
+* AWSの構成管理には CloudFormation を、各サーバのミドルウェアの管理には Ansible を使用します。
+* Webアプリへの負荷掛けは JMeter サーバ/クライアントを通して行います。
+* Webサーバには Apache httpd と Tomcat、アプリケーションは [TERASOLUNAサンプルアプリケーション](https://github.com/terasolunaorg/terasoluna-tourreservation)を使用します。
+* DBエンジンは PostgreSQL を採用します。
+
+
+
 ## AWS構成図
+
+AWS 構成図は以下となります。
 
 <img width=80% alt="システム概要図" src="./.figure/01_AWS/1000.png">
 
@@ -77,11 +93,11 @@ https://dev.classmethod.jp/articles/aws-beginner-ec2-ssh/
 
 ログインが確認出来たら、サーバの ~/.ssh フォルダに key-performance-test.pem を転送します。転送後、鍵のパーミッションを 600 に設定してください。
 
-この鍵を用いて、構成管理から JMeterサーバ、WebAPサーバに接続します。
-
 https://qiita.com/go-to/items/409e32116213bdf4b1ce
 
 <img width=50% alt="システム概要図" src="./.figure/01_AWS/1009.png">
+
+この鍵を用いて、構成管理から JMeterサーバ、WebAPサーバに接続します。
 
 ### JMeter クライアント
 
@@ -124,6 +140,10 @@ psql -h db.tourreserve.local -U postgres -d tourreserve
 Password for user postgres: P0stgres
 tourreserve=> \q
 ```
+
+
+ここまで出来たら構築は完了です。以降は、各 CloudFormation コードの解説をしていきます。
+
 
 # CloudFormation 詳細
 
