@@ -58,6 +58,11 @@
         LaunchTemplateData:
           # 基本設定
           ImageId: !Ref EC2ImageID
+          InstanceMarketOptions:
+            MarketType: spot
+            SpotOptions: 
+              InstanceInterruptionBehavior: terminate
+              SpotInstanceType: one-time
           KeyName: !Ref KeyName
           InstanceType: !Ref EC2InstanceType
           # ネットワーク設定

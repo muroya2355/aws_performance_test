@@ -1,0 +1,2 @@
+- name: yum install golang 
+  yum: name=golang state=latest
