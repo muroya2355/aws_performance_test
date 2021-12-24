@@ -36,16 +36,16 @@
   # ------------------------
   # JMeterサーバ用パラメータ
   # ------------------------
-    TestJemeterPrivateIP:
+    TestJmeterPrivateIP:
       Type: String
       Default: 192.168.30.31
-    TestJemeterImageID:
+    TestJmeterImageID:
       Type: AWS::SSM::Parameter::Value<String>
       Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
-    TestJemeterInstanceType:
+    TestJmeterInstanceType:
       Type: String
       Default: t3.micro
-    TestJemeterKeyName:
+    TestJmeterKeyName:
       Type: "AWS::EC2::KeyPair::KeyName"
       Default: "key-performance-test"
 
@@ -76,14 +76,62 @@
         Roles:
         - !ImportValue EC2IAMRole
 
+    # 起動テンプレート
+    TestAnsibleLaunchTemplate:
+      Type: AWS::EC2::LaunchTemplate
+      Properties:
+        LaunchTemplateName: TestAnsibleLaunchTemplate
+        LaunchTemplateData:
+          # 基本設定
+          ImageId: !Ref TestAnsibleImageID
+          InstanceMarketOptions:
+            MarketType: spot
+            SpotOptions: 
+              InstanceInterruptionBehavior: stop
+              SpotInstanceType: persistent
+          KeyName: !Ref TestAnsibleKeyName
+          InstanceType: !Ref TestAnsibleInstanceType
+          # EBS設定
+          BlockDeviceMappings:
+          - DeviceName: /dev/sda1
+            Ebs:
+              VolumeType: gp2
+              VolumeSize: 8
+              DeleteOnTermination: true
+          # IAMロールをインスタンスにアタッチ
+          IamInstanceProfile:
+            Arn: !GetAtt
+              - TestAnsibleIAMInstanceProfile
+              - Arn
+          # ユーザデータの設定（AnsibleからWinRMでリモート操作の許可）
+          UserData:
+            Fn::Base64: |
+              #!/bin/bash
+              sudo yum install -y git
+              sudo amazon-linux-extras install -y python3.8
+              sudo pip3.8 install --upgrade pip
+              /usr/local/bin/pip3.8 install ansible
+              /usr/local/bin/pip3.8 install boto3 botocore
+              /usr/local/bin/pip3.8 install pywinrm
+              sudo yum -y install postgresql.x86_64
+              source .bash_profile
+          # タグ設定
+          TagSpecifications:
+          - ResourceType: instance
+            Tags:
+            - Key: Name
+              Value: testansible-launchsetting
+
+
     # インスタンス設定
     TestAnsibleInstance:
       Type: AWS::EC2::Instance
       Properties: 
-        # 基本設定
-        ImageId: !Ref TestAnsibleImageID
-        KeyName: !Ref TestAnsibleKeyName
-        InstanceType: !Ref TestAnsibleInstanceType
+        # 起動テンプレートの設定
+        LaunchTemplate:
+          # 起動テンプレートのID
+          LaunchTemplateId: !Ref TestAnsibleLaunchTemplate
+          Version: !GetAtt TestAnsibleLaunchTemplate.LatestVersionNumber
         # ネットワーク設定
         NetworkInterfaces:
           - AssociatePublicIpAddress: "true"
@@ -92,33 +140,12 @@
             PrivateIpAddress: !Ref TestAnsiblePrivateIP
             GroupSet:
               - !Ref TestAnsibleSG
-        # EBS設定
-        BlockDeviceMappings:
-        - DeviceName: /dev/sda1
-          Ebs:
-            VolumeType: gp2
-            VolumeSize: 8
-            DeleteOnTermination: true
-        # IAMロールをインスタンスにアタッチ
-        IamInstanceProfile: !Ref TestAnsibleIAMInstanceProfile
-        # ユーザデータの設定（必要パッケージのインストール）
-        UserData:
-          Fn::Base64: |
-            #!/bin/bash
-            sudo yum install -y git
-            sudo amazon-linux-extras install -y python3.8
-            sudo pip3.8 install --upgrade pip
-            /usr/local/bin/pip3.8 install ansible
-            /usr/local/bin/pip3.8 install boto3 botocore
-            /usr/local/bin/pip3.8 install pywinrm
-            sudo yum -y install postgresql.x86_64
-            source .bash_profile
         # タグ設定
         Tags:
-            - Key: Name
-              Value: test-ansible
-            - Key: Application
-              Value: ansible
+          - Key: Name
+            Value: test-ansible
+          - Key: Application
+            Value: ansible
 
 
   # ------------------------
@@ -148,7 +175,7 @@
         # JMeterサーバからの通信を許可
         GroupId: !Ref TestWinSG
         IpProtocol: -1
-        SourceSecurityGroupId: !Ref TestJemeterSG
+        SourceSecurityGroupId: !Ref TestJmeterSG
 
     # IAMロールからインスタンスプロファイルの設定
     TestWinIAMInstanceProfile:
@@ -158,14 +185,58 @@
         Roles:
         - !ImportValue EC2IAMRole
 
+    # 起動テンプレート
+    TestWinLaunchTemplate:
+      Type: AWS::EC2::LaunchTemplate
+      Properties:
+        LaunchTemplateName: TestWinLaunchTemplate
+        LaunchTemplateData:
+          # 基本設定
+          ImageId: !Ref TestWinImageID
+          InstanceMarketOptions:
+            MarketType: spot
+            SpotOptions: 
+              InstanceInterruptionBehavior: stop
+              SpotInstanceType: persistent
+          KeyName: !Ref TestAnsibleKeyName
+          InstanceType: !Ref TestWinInstanceType
+          # EBS設定
+          BlockDeviceMappings:
+          - DeviceName: /dev/sda1
+            Ebs:
+              VolumeType: gp2
+              VolumeSize: 30
+              DeleteOnTermination: true
+          # IAMロールをインスタンスにアタッチ
+          IamInstanceProfile:
+            Arn: !GetAtt
+              - TestWinIAMInstanceProfile
+              - Arn
+          # ユーザデータの設定（AnsibleからWinRMでリモート操作の許可）
+          UserData:
+            Fn::Base64: |
+              <powershell>
+              $url = "https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1"
+              $file = "$env:temp\ConfigureRemotingForAnsible.ps1"
+              (New-Object -TypeName System.Net.WebClient).DownloadFile($url, $file)
+              powershell.exe -ExecutionPolicy ByPass -File $file
+              </powershell>
+          # タグ設定
+          TagSpecifications:
+          - ResourceType: instance
+            Tags:
+            - Key: Name
+              Value: testwin-launchsetting
+
     # インスタンス設定
     TestWinInstance:
       Type: AWS::EC2::Instance
-      Properties: 
-        # 基本設定
-        ImageId: !Ref TestWinImageID
-        KeyName: !Ref TestAnsibleKeyName
-        InstanceType: !Ref TestWinInstanceType
+      Properties:
+        # 起動テンプレートの設定
+        LaunchTemplate:
+          # 起動テンプレートのID
+          LaunchTemplateId: !Ref TestWinLaunchTemplate
+          Version: !GetAtt TestWinLaunchTemplate.LatestVersionNumber
         # ネットワーク設定
         NetworkInterfaces:
           - DeviceIndex: "0"
@@ -173,41 +244,23 @@
             PrivateIpAddress: !Ref TestWinPrivateIP
             GroupSet:
               - !Ref TestWinSG
-        # EBS設定
-        BlockDeviceMappings:
-        - DeviceName: /dev/sda1
-          Ebs:
-            VolumeType: gp2
-            VolumeSize: 30
-            DeleteOnTermination: true
-        # IAMロールをインスタンスにアタッチ
-        IamInstanceProfile: !Ref TestWinIAMInstanceProfile
-        # ユーザデータの設定（AnsibleからWinRMでリモート操作の許可）
-        UserData:
-          Fn::Base64: |
-            <powershell>
-            $url = "https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1"
-            $file = "$env:temp\ConfigureRemotingForAnsible.ps1"
-            (New-Object -TypeName System.Net.WebClient).DownloadFile($url, $file)
-            powershell.exe -ExecutionPolicy ByPass -File $file
-            </powershell>
         # タグ設定
         Tags:
-            - Key: Name
-              Value: test-win
-            - Key: Application
-              Value: windows
+          - Key: Name
+            Value: test-win
+          - Key: Application
+            Value: windows
 
 
   # ------------------------
   # JMeterサーバ用リソース
   # ------------------------
     # セキュリティグループ
-    TestJemeterSG:
+    TestJmeterSG:
       Type: AWS::EC2::SecurityGroup
       Properties:
-        GroupName: sg_testjemeter
-        GroupDescription: "SG for TestJemeter"
+        GroupName: sg_testjmeter
+        GroupDescription: "SG for TestJmeter"
         VpcId: !ImportValue VPCID
         SecurityGroupIngress:
           # 構成管理サーバからの接続許可
@@ -220,43 +273,70 @@
             SourceSecurityGroupId: !Ref TestWinSG
 
     # IAMロールからインスタンスプロファイルの設定
-    TestJemeterIAMInstanceProfile:
+    TestJmeterIAMInstanceProfile:
       Type: "AWS::IAM::InstanceProfile"
       Properties:
         Path: "/"
         Roles:
         - !ImportValue EC2IAMRole
 
+    # 起動テンプレート
+    TestJmeterLaunchTemplate:
+      Type: AWS::EC2::LaunchTemplate
+      Properties:
+        LaunchTemplateName: TestJmeterLaunchTemplate
+        LaunchTemplateData:
+          # 基本設定
+          ImageId: !Ref TestJmeterImageID
+          InstanceMarketOptions:
+            MarketType: spot
+            SpotOptions: 
+              InstanceInterruptionBehavior: stop
+              SpotInstanceType: persistent
+          KeyName: !Ref TestJmeterKeyName
+          InstanceType: !Ref TestJmeterInstanceType
+          # EBS設定
+          BlockDeviceMappings:
+          - DeviceName: /dev/sda1
+            Ebs:
+              VolumeType: gp2
+              VolumeSize: 8
+              DeleteOnTermination: true
+          # IAMロールをインスタンスにアタッチ
+          IamInstanceProfile:
+            Arn: !GetAtt
+              - TestJmeterIAMInstanceProfile
+              - Arn
+          # タグ設定
+          TagSpecifications:
+          - ResourceType: instance
+            Tags:
+            - Key: Name
+              Value: testjmeter-launchsetting
+
     # インスタンス設定
-    TestJemeterInstance:
+    TestJmeterInstance:
       Type: AWS::EC2::Instance
       Properties: 
-        # 基本設定
-        ImageId: !Ref TestJemeterImageID
-        KeyName: !Ref TestJemeterKeyName
-        InstanceType: !Ref TestJemeterInstanceType
+        # 起動テンプレートの設定
+        LaunchTemplate:
+          # 起動テンプレートのID
+          LaunchTemplateId: !Ref TestJmeterLaunchTemplate
+          Version: !GetAtt TestJmeterLaunchTemplate.LatestVersionNumber
         # ネットワーク設定
         NetworkInterfaces:
           - DeviceIndex: "0"
             SubnetId: !Select [0, !Split [",", !ImportValue PrivateSubnetIDs]]
-            PrivateIpAddress: !Ref TestJemeterPrivateIP
+            PrivateIpAddress: !Ref TestJmeterPrivateIP
             GroupSet:
-              - !Ref TestJemeterSG
-        # EBS設定
-        BlockDeviceMappings:
-        - DeviceName: /dev/sda1
-          Ebs:
-            VolumeType: gp2
-            VolumeSize: 8
-            DeleteOnTermination: true
-        # IAMロールをインスタンスにアタッチ
-        IamInstanceProfile: !Ref TestJemeterIAMInstanceProfile
+              - !Ref TestJmeterSG
         # タグ設定
         Tags:
-            - Key: Name
-              Value: test-jmeter
-            - Key: Application
-              Value: jmeter-server
+          - Key: Name
+            Value: test-jmeter
+          - Key: Application
+            Value: jmeter-server
+
 
   # ------------------------
   # リソースID出力
@@ -270,7 +350,7 @@
       Value: !Ref TestWinSG
       Export:
         Name: TestWinSG
-    TestJemeterSG:
-      Value: !Ref TestJemeterSG
+    TestJmeterSG:
+      Value: !Ref TestJmeterSG
       Export:
-        Name: TestJemeterSG
+        Name: TestJmeterSG

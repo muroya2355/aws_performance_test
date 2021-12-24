@@ -1,0 +1,276 @@
+---
+  AWSTemplateFormatVersion: '2010-09-09'
+  Description: 'TestEC2/SG/Key'
+  
+  Parameters:
+  # ------------------------
+  # 構成管理サーバ用パラメータ
+  # ------------------------
+    TestAnsiblePrivateIP:
+      Type: String
+      Default: 192.168.10.11
+    TestAnsibleImageID:
+      Type: AWS::SSM::Parameter::Value<String>
+      Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+    TestAnsibleInstanceType:
+      Type: String
+      Default: t3.micro
+    TestAnsibleKeyName:
+      Type: "AWS::EC2::KeyPair::KeyName"
+      Default: "key-performance-test"
+    FromIPSegment:
+      Type: String
+      Default: XXX.XXX.XXX.XXX/32
+  # ------------------------
+  # JMeterクライアント用パラメータ
+  # ------------------------
+    TestWinPrivateIP:
+      Type: String
+      Default: 192.168.30.21
+    TestWinImageID:
+      Type: AWS::SSM::Parameter::Value<String>
+      Default: /aws/service/ami-windows-latest/Windows_Server-2019-Japanese-Full-Base
+    TestWinInstanceType:
+      Type: String
+      Default: t3.micro
+  # ------------------------
+  # JMeterサーバ用パラメータ
+  # ------------------------
+    TestJemeterPrivateIP:
+      Type: String
+      Default: 192.168.30.31
+    TestJemeterImageID:
+      Type: AWS::SSM::Parameter::Value<String>
+      Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+    TestJemeterInstanceType:
+      Type: String
+      Default: t3.micro
+    TestJemeterKeyName:
+      Type: "AWS::EC2::KeyPair::KeyName"
+      Default: "key-performance-test"
+
+
+  Resources:
+  # ------------------------
+  # 構成管理サーバ
+  # ------------------------
+    # セキュリティグループ
+    TestAnsibleSG:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        GroupName: sg_testansible
+        GroupDescription: "SG for TestAnsible"
+        VpcId: !ImportValue VPCID
+        # 作業用PCからの通信を許可
+        SecurityGroupIngress:
+          - IpProtocol: tcp
+            FromPort: 22
+            ToPort: 22
+            CidrIp: !Ref FromIPSegment
+
+    # IAMロールからインスタンスプロファイルの設定
+    TestAnsibleIAMInstanceProfile:
+      Type: "AWS::IAM::InstanceProfile"
+      Properties:
+        Path: "/"
+        Roles:
+        - !ImportValue EC2IAMRole
+
+    # インスタンス設定
+    TestAnsibleInstance:
+      Type: AWS::EC2::Instance
+      Properties: 
+        # 基本設定
+        ImageId: !Ref TestAnsibleImageID
+        KeyName: !Ref TestAnsibleKeyName
+        InstanceType: !Ref TestAnsibleInstanceType
+        # ネットワーク設定
+        NetworkInterfaces:
+          - AssociatePublicIpAddress: "true"
+            DeviceIndex: "0"
+            SubnetId: !Select [0, !Split [",", !ImportValue PublicSubnetIDs]]
+            PrivateIpAddress: !Ref TestAnsiblePrivateIP
+            GroupSet:
+              - !Ref TestAnsibleSG
+        # EBS設定
+        BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeType: gp2
+            VolumeSize: 8
+            DeleteOnTermination: true
+        # IAMロールをインスタンスにアタッチ
+        IamInstanceProfile: !Ref TestAnsibleIAMInstanceProfile
+        # ユーザデータの設定（必要パッケージのインストール）
+        UserData:
+          Fn::Base64: |
+            #!/bin/bash
+            sudo yum install -y git
+            sudo amazon-linux-extras install -y python3.8
+            sudo pip3.8 install --upgrade pip
+            /usr/local/bin/pip3.8 install ansible
+            /usr/local/bin/pip3.8 install boto3 botocore
+            /usr/local/bin/pip3.8 install pywinrm
+            sudo yum -y install postgresql.x86_64
+            source .bash_profile
+        # タグ設定
+        Tags:
+            - Key: Name
+              Value: test-ansible
+            - Key: Application
+              Value: ansible
+
+
+  # ------------------------
+  # JMeterクライアント用リソース
+  # ------------------------
+    # セキュリティグループ
+    TestWinSG:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        GroupName: sg_testwin
+        GroupDescription: "SG for TestWin"
+        VpcId: !ImportValue VPCID
+        SecurityGroupIngress:
+          # 構成管理サーバからの通信を許可
+          - IpProtocol: tcp
+            FromPort: 3389
+            ToPort: 3389
+            SourceSecurityGroupId: !Ref TestAnsibleSG
+          - IpProtocol: tcp
+            FromPort: 5986
+            ToPort: 5986
+            SourceSecurityGroupId: !Ref TestAnsibleSG
+
+    TestWinSecurityGroupIngress:
+      Type: AWS::EC2::SecurityGroupIngress
+      Properties:
+        # JMeterサーバからの通信を許可
+        GroupId: !Ref TestWinSG
+        IpProtocol: -1
+        SourceSecurityGroupId: !Ref TestJemeterSG
+
+    # IAMロールからインスタンスプロファイルの設定
+    TestWinIAMInstanceProfile:
+      Type: "AWS::IAM::InstanceProfile"
+      Properties:
+        Path: "/"
+        Roles:
+        - !ImportValue EC2IAMRole
+
+    # インスタンス設定
+    TestWinInstance:
+      Type: AWS::EC2::Instance
+      Properties: 
+        # 基本設定
+        ImageId: !Ref TestWinImageID
+        KeyName: !Ref TestAnsibleKeyName
+        InstanceType: !Ref TestWinInstanceType
+        # ネットワーク設定
+        NetworkInterfaces:
+          - DeviceIndex: "0"
+            SubnetId: !Select [0, !Split [",", !ImportValue PrivateSubnetIDs]]
+            PrivateIpAddress: !Ref TestWinPrivateIP
+            GroupSet:
+              - !Ref TestWinSG
+        # EBS設定
+        BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeType: gp2
+            VolumeSize: 30
+            DeleteOnTermination: true
+        # IAMロールをインスタンスにアタッチ
+        IamInstanceProfile: !Ref TestWinIAMInstanceProfile
+        # ユーザデータの設定（AnsibleからWinRMでリモート操作の許可）
+        UserData:
+          Fn::Base64: |
+            <powershell>
+            $url = "https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1"
+            $file = "$env:temp\ConfigureRemotingForAnsible.ps1"
+            (New-Object -TypeName System.Net.WebClient).DownloadFile($url, $file)
+            powershell.exe -ExecutionPolicy ByPass -File $file
+            </powershell>
+        # タグ設定
+        Tags:
+            - Key: Name
+              Value: test-win
+            - Key: Application
+              Value: windows
+
+
+  # ------------------------
+  # JMeterサーバ用リソース
+  # ------------------------
+    # セキュリティグループ
+    TestJemeterSG:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        GroupName: sg_testjemeter
+        GroupDescription: "SG for TestJemeter"
+        VpcId: !ImportValue VPCID
+        SecurityGroupIngress:
+          # 構成管理サーバからの接続許可
+          - IpProtocol: tcp
+            FromPort: 22
+            ToPort: 22
+            SourceSecurityGroupId: !Ref TestAnsibleSG
+          # JMeterクライアントからの接続許可
+          - IpProtocol: -1
+            SourceSecurityGroupId: !Ref TestWinSG
+
+    # IAMロールからインスタンスプロファイルの設定
+    TestJemeterIAMInstanceProfile:
+      Type: "AWS::IAM::InstanceProfile"
+      Properties:
+        Path: "/"
+        Roles:
+        - !ImportValue EC2IAMRole
+
+    # インスタンス設定
+    TestJemeterInstance:
+      Type: AWS::EC2::Instance
+      Properties: 
+        # 基本設定
+        ImageId: !Ref TestJemeterImageID
+        KeyName: !Ref TestJemeterKeyName
+        InstanceType: !Ref TestJemeterInstanceType
+        # ネットワーク設定
+        NetworkInterfaces:
+          - DeviceIndex: "0"
+            SubnetId: !Select [0, !Split [",", !ImportValue PrivateSubnetIDs]]
+            PrivateIpAddress: !Ref TestJemeterPrivateIP
+            GroupSet:
+              - !Ref TestJemeterSG
+        # EBS設定
+        BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeType: gp2
+            VolumeSize: 8
+            DeleteOnTermination: true
+        # IAMロールをインスタンスにアタッチ
+        IamInstanceProfile: !Ref TestJemeterIAMInstanceProfile
+        # タグ設定
+        Tags:
+            - Key: Name
+              Value: test-jmeter
+            - Key: Application
+              Value: jmeter-server
+
+  # ------------------------
+  # リソースID出力
+  # ------------------------
+  Outputs:
+    TestAnsibleSG:
+      Value: !Ref TestAnsibleSG
+      Export:
+        Name: TestAnsibleSG
+    TestWinSG:
+      Value: !Ref TestWinSG
+      Export:
+        Name: TestWinSG
+    TestJemeterSG:
+      Value: !Ref TestJemeterSG
+      Export:
+        Name: TestJemeterSG

@@ -136,7 +136,7 @@
           - IpProtocol: tcp
             FromPort: 80
             ToPort: 80
-            SourceSecurityGroupId: !ImportValue  TestJemeterSG
+            SourceSecurityGroupId: !ImportValue  TestJmeterSG
 
     # ターゲットグループ
     WebAPLocalTargetGroup: 
