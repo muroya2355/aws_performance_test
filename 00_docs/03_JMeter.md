@@ -31,6 +31,13 @@
 |ツアーテーブル|約160万件|00260_insert_tourinfo.sql|
 |ツアー担当者テーブル|約160万件|00270_insert_tourcon.sql|
 
+```sh:構成管理サーバ
+$ cd ~
+$ psql -h local.db.tourreserve.com -U postgres -d tourreserve
+Password for user postgres: P0stgres
+tourreserve=> \i ~/aws_performance_test/03_JMeter/00220_insert_accommodation.sql
+```
+
 # JMeter動作確認
 
 ## トップページ表示

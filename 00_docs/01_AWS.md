@@ -134,7 +134,7 @@ ssh -i .ssh/key-performance-test.pem [WebAPサーバのIPアドレス]
 psql コマンドでデータベースにログインします。
 
 ```
-psql -h db.tourreserve.local -U postgres -d tourreserve
+psql -h local.db.tourreserve.com -U postgres -d tourreserve
 Password for user postgres: P0stgres
 tourreserve=> \q
 ```
