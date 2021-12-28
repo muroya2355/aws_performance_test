@@ -36,6 +36,13 @@ $ cd ~
 $ psql -h local.db.tourreserve.com -U postgres -d tourreserve
 Password for user postgres: P0stgres
 tourreserve=> \i ~/aws_performance_test/03_JMeter/00220_insert_accommodation.sql
+tourreserve=> select count(*) from accommodation;
+ count
+-------
+  5000
+(1 row)
+tourreserve=> \i ~/aws_performance_test/03_JMeter/00250_insert_customer.sql
+tourreserve=> select count(*) from accommodation;
 ```
 
 # JMeter動作確認
