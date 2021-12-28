@@ -55,7 +55,7 @@ BEGIN
               , '2147483647'
               , TO_CHAR(dept, 'FM09')
               , TO_CHAR(arrv, 'FM09')
-              , TO_CHAR(FLOOR(RANDOM()*8000+1), 'FM0000')
+              , TO_CHAR(FLOOR(RANDOM()*5000+1), 'FM0000')
               , '14000'
               , '1'
               , 'そこは別天地、静寂と湯けむりの待つ宿へ…'||CHR(13)||CHR(10)||'詳しい情報はお取り合わせをお願い致します。'
@@ -86,7 +86,7 @@ BEGIN
               , '2147483647'
               , TO_CHAR(dept, 'FM09')
               , TO_CHAR(arrv, 'FM09')
-              , TO_CHAR(FLOOR(RANDOM()*8000)+1, 'FM0000')
+              , TO_CHAR(FLOOR(RANDOM()*5000)+1, 'FM0000')
               , '11000'
               , '0'
               , 'そこは別天地、静寂と湯けむりの待つ宿へ…'||CHR(13)||CHR(10)||'詳しい情報はお取り合わせをお願い致します。'
@@ -117,7 +117,7 @@ BEGIN
             , '2147483647'
             , TO_CHAR(dept, 'FM09')
             , TO_CHAR(arrv, 'FM09')
-            , TO_CHAR(FLOOR(RANDOM()*8000+1), 'FM0000')
+            , TO_CHAR(FLOOR(RANDOM()*5000+1), 'FM0000')
             , '19000'
             , '1'
             , 'そこは別天地、静寂と湯けむりの待つ宿へ…'||CHR(13)||CHR(10)||'詳しい情報はお取り合わせをお願い致します。'
@@ -148,7 +148,7 @@ BEGIN
             , '2147483647'
             , TO_CHAR(dept, 'FM09')
             , TO_CHAR(arrv, 'FM09')
-            , TO_CHAR(FLOOR(RANDOM()*8000+1), 'FM0000')
+            , TO_CHAR(FLOOR(RANDOM()*5000+1), 'FM0000')
             , '16000'
             , '0'
             , 'そこは別天地、静寂と湯けむりの待つ宿へ…'||CHR(13)||CHR(10)||'詳しい情報はお取り合わせをお願い致します。'
@@ -179,7 +179,7 @@ BEGIN
             , '2147483647'
             , TO_CHAR(dept, 'FM09')
             , TO_CHAR(arrv, 'FM09')
-            , TO_CHAR(FLOOR(RANDOM()*8000+1), 'FM0000')
+            , TO_CHAR(FLOOR(RANDOM()*5000+1), 'FM0000')
             , '23000'
             , '1'
             , 'そこは別天地、静寂と湯けむりの待つ宿へ…'||CHR(13)||CHR(10)||'詳しい情報はお取り合わせをお願い致します。'
@@ -210,7 +210,7 @@ BEGIN
             , '2147483647'
             , TO_CHAR(dept, 'FM09')
             , TO_CHAR(arrv, 'FM09')
-            , TO_CHAR(FLOOR(RANDOM()*8000+1), 'FM0000')
+            , TO_CHAR(FLOOR(RANDOM()*5000+1), 'FM0000')
             , '20000'
             , '0'
             , 'そこは別天地、静寂と湯けむりの待つ宿へ…'||CHR(13)||CHR(10)||'詳しい情報はお取り合わせをお願い致します。'
@@ -241,7 +241,7 @@ BEGIN
             , '2147483647'
             , TO_CHAR(dept, 'FM09')
             , TO_CHAR(arrv, 'FM09')
-            , TO_CHAR(FLOOR(RANDOM()*8000+1), 'FM0000')
+            , TO_CHAR(FLOOR(RANDOM()*5000+1), 'FM0000')
             , '30000'
             , '1'
             , 'そこは別天地、静寂と湯けむりの待つ宿へ…'||CHR(13)||CHR(10)||'詳しい情報はお取り合わせをお願い致します。'
@@ -272,7 +272,7 @@ BEGIN
             , '2147483647'
             , TO_CHAR(dept, 'FM09')
             , TO_CHAR(arrv, 'FM09')
-            , TO_CHAR(FLOOR(RANDOM()*8000+1), 'FM0000')
+            , TO_CHAR(FLOOR(RANDOM()*5000+1), 'FM0000')
             , '27000'
             , '0'
             , 'そこは別天地、静寂と湯けむりの待つ宿へ…'||CHR(13)||CHR(10)||'詳しい情報はお取り合わせをお願い致します。'
@@ -303,7 +303,7 @@ BEGIN
             , '2147483647'
             , TO_CHAR(dept, 'FM09')
             , TO_CHAR(arrv, 'FM09')
-            , TO_CHAR(FLOOR(RANDOM()*8000+1), 'FM0000')
+            , TO_CHAR(FLOOR(RANDOM()*5000+1), 'FM0000')
             , '37000'
             , '1'
             , 'そこは別天地、静寂と湯けむりの待つ宿へ…'||CHR(13)||CHR(10)||'詳しい情報はお取り合わせをお願い致します。'
@@ -334,7 +334,7 @@ BEGIN
             , '2147483647'
             , TO_CHAR(dept, 'FM09')
             , TO_CHAR(arrv, 'FM09')
-            , TO_CHAR(FLOOR(RANDOM()*8000+1), 'FM0000')
+            , TO_CHAR(FLOOR(RANDOM()*5000+1), 'FM0000')
             , '34000'
             , '0'
             , 'そこは別天地、静寂と湯けむりの待つ宿へ…'||CHR(13)||CHR(10)||'詳しい情報はお取り合わせをお願い致します。'
@@ -365,7 +365,7 @@ BEGIN
             , '2147483647'
             , TO_CHAR(dept, 'FM09')
             , TO_CHAR(arrv, 'FM09')
-            , TO_CHAR(FLOOR(RANDOM()*8000+1), 'FM0000')
+            , TO_CHAR(FLOOR(RANDOM()*5000+1), 'FM0000')
             , '45000'
             , '1'
             , 'そこは別天地、静寂と湯けむりの待つ宿へ…'||CHR(13)||CHR(10)||'詳しい情報はお取り合わせをお願い致します。'
@@ -396,7 +396,7 @@ BEGIN
             , '2147483647'
             , TO_CHAR(dept, 'FM09')
             , TO_CHAR(arrv, 'FM09')
-            , TO_CHAR(FLOOR(RANDOM()*8000+1), 'FM0000')
+            , TO_CHAR(FLOOR(RANDOM()*5000+1), 'FM0000')
             , '75000'
             , '1'
             , 'そこは別天地、静寂と湯けむりの待つ宿へ…'||CHR(13)||CHR(10)||'詳しい情報はお取り合わせをお願い致します。'

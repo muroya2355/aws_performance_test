@@ -42,7 +42,13 @@ tourreserve=> select count(*) from accommodation;
   5000
 (1 row)
 tourreserve=> \i ~/aws_performance_test/03_JMeter/00250_insert_customer.sql
-tourreserve=> select count(*) from accommodation;
+tourreserve=> select count(*) from customer;
+ count
+--------
+ 100000
+(1 row)
+tourreserve=> \i ~/aws_performance_test/03_JMeter/00260_insert_tourinfo.sql
+tourreserve=> select count(*) from customer;
 ```
 
 # JMeter動作確認
