@@ -48,7 +48,7 @@ tourreserve=> select count(*) from customer;
  100000
 (1 row)
 tourreserve=> \i ~/aws_performance_test/03_JMeter/00260_insert_tourinfo.sql
-tourreserve=> select count(*) from customer;
+tourreserve=> select count(*) from tourinfo;
 ```
 
 # JMeter動作確認

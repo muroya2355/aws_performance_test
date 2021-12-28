@@ -473,7 +473,7 @@ DELETE FROM TOURCON;
 DELETE FROM TOURINFO;
 ALTER SEQUENCE TOUR_CODE_SEQ RESTART WITH 1 INCREMENT BY 1;
 SELECT  C_TOURINFO('【おすすめ】Terasolunaツアー');
-SELECT  C_TOURINFO('【期間限定】スペシャルツアー');
+-- SELECT  C_TOURINFO('【期間限定】スペシャルツアー');
 -- SELECT  C_TOURINFO2('日帰り別天地ツアー');
 
 --  初期データ登録用のプロシージャとシーケンスを削除する。 --
