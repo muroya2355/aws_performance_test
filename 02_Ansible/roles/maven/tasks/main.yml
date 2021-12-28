@@ -5,7 +5,7 @@
 
 - name: Mavenのインストーラを取得
   get_url:
-    url: https://dlcdn.apache.org/maven/maven-3/3.8.3/binaries/apache-maven-3.8.3-bin.tar.gz
+    url: https://archive.apache.org/dist/maven/maven-3/3.8.3/binaries/apache-maven-3.8.3-bin.tar.gz
     dest: /tmp/apache-maven-3.8.3-bin.tar.gz
     checksum: sha512:1c12a5df43421795054874fd54bb8b37d242949133b5bf6052a063a13a93f13a20e6e9dae2b3d85b9c7034ec977bbc2b6e7f66832182b9c863711d78bfe60faa
     force: True

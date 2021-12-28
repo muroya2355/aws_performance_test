@@ -5,7 +5,6 @@
   become: yes
 
   roles:
-    - golang
     - cloudwatch_agent
     - corretto
     - maven
