@@ -27,7 +27,7 @@ BEGIN
   i := 1;
   FOR dept IN 1..47 LOOP
     FOR arrv IN 1..47 LOOP
-      FOR days_after IN 0..0 LOOP
+      FOR days_after IN 0..30 LOOP
         FOR i IN 1..1 LOOP
 
           SELECT TO_CHAR(nextval('TOUR_CODE_SEQ'), 'FM0000000999') INTO tourCode;
@@ -423,9 +423,9 @@ DECLARE
 BEGIN
   days_after := 0;
   FOR destination IN 1..47 LOOP
-    FOR days_after IN 0..0 LOOP
+    FOR days_after IN 0..30 LOOP
       i := 1;
-      FOR i IN 1..1 LOOP
+      FOR i IN 1..5 LOOP
           SELECT
           TO_CHAR(nextval('TOUR_CODE_SEQ'), 'FM0000000999') INTO tourCode;
           --FROM
