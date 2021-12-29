@@ -28,8 +28,8 @@
 |-|-|-|
 |宿泊施設テーブル|5000件|00220_insert_accommodation.sql|
 |顧客テーブル|10万件|00250_insert_customer.sql|
-|ツアーテーブル|約160万件|00260_insert_tourinfo.sql|
-|ツアー担当者テーブル|約160万件|00270_insert_tourcon.sql|
+|ツアーテーブル|約150万件|00260_insert_tourinfo.sql|
+|ツアー担当者テーブル|約180万件|00270_insert_tourcon.sql|
 
 ```sh:構成管理サーバ
 $ cd ~
@@ -49,11 +49,26 @@ tourreserve=> select count(*) from customer;
 (1 row)
 tourreserve=> \i ~/aws_performance_test/03_JMeter/00260_insert_tourinfo.sql
 tourreserve=> select count(*) from tourinfo;
+  count
+---------
+ 1537464
+(1 row)
+tourreserve=> \i ~/aws_performance_test/03_JMeter/00270_insert_tourcon.sql
+tourreserve=> select count(*) from tourcon;
+  count
+---------
+ 1805355
+(1 row)
 ```
 
 # JMeter動作確認
 
 ## トップページ表示
+
+## ログイン/ログアウト
+https://blackbird-blog.com/jmeter-02
+https://blackbird-blog.com/jmeter-login-case01
+https://blackbird-blog.com/jmeter-login-case02
 
 ## ツアー検索/詳細表示
 

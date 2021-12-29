@@ -21,13 +21,13 @@ DECLARE
   days_after INT;
   i INT;
 BEGIN
-  days_after := 1;
+  days_after := 0;
   dept := 1;
   arrv := 1;
   i := 1;
   FOR dept IN 1..47 LOOP
     FOR arrv IN 1..47 LOOP
-      FOR days_after IN 3..60 LOOP
+      FOR days_after IN 0..0 LOOP
         FOR i IN 1..1 LOOP
 
           SELECT TO_CHAR(nextval('TOUR_CODE_SEQ'), 'FM0000000999') INTO tourCode;
@@ -47,11 +47,11 @@ BEGIN
               , TOUR_ABS
           ) VALUES (
               tourCode
-              , CURRENT_DATE
+              , date '2022-01-01'
               , (TO_CHAR(dept, 'FM09')||TO_CHAR(arrv, 'FM09'))
               , (tourName||'(日帰り)01')
               , '1'
-              , (CURRENT_DATE + days_after)
+              , (date '2022-01-01' + days_after)
               , '2147483647'
               , TO_CHAR(dept, 'FM09')
               , TO_CHAR(arrv, 'FM09')
@@ -78,11 +78,11 @@ BEGIN
               , TOUR_ABS
           ) VALUES (
               tourCode
-              , CURRENT_DATE
+              , date '2022-01-01'
               , (TO_CHAR(dept, 'FM09')||TO_CHAR(arrv, 'FM09'))
               , (tourName||'(日帰り)02')
               , '1'
-              , (CURRENT_DATE + days_after)
+              , (date '2022-01-01' + days_after)
               , '2147483647'
               , TO_CHAR(dept, 'FM09')
               , TO_CHAR(arrv, 'FM09')
@@ -109,11 +109,11 @@ BEGIN
             , TOUR_ABS
           ) VALUES (
             tourCode
-            , CURRENT_DATE
+            , date '2022-01-01'
             , (TO_CHAR(dept, 'FM09')||TO_CHAR(arrv, 'FM09'))
             , (tourName||'(1泊2日)01')
             , '2'
-            , (CURRENT_DATE + days_after)
+            , (date '2022-01-01' + days_after)
             , '2147483647'
             , TO_CHAR(dept, 'FM09')
             , TO_CHAR(arrv, 'FM09')
@@ -140,11 +140,11 @@ BEGIN
             , TOUR_ABS
           ) VALUES (
             tourCode
-            , CURRENT_DATE
+            , date '2022-01-01'
             , (TO_CHAR(dept, 'FM09')||TO_CHAR(arrv, 'FM09'))
             , (tourName||'(1泊2日)02')
             , '2'
-            , (CURRENT_DATE + days_after)
+            , (date '2022-01-01' + days_after)
             , '2147483647'
             , TO_CHAR(dept, 'FM09')
             , TO_CHAR(arrv, 'FM09')
@@ -171,11 +171,11 @@ BEGIN
             , TOUR_ABS
           ) VALUES (
             tourCode
-            , CURRENT_DATE
+            , date '2022-01-01'
             , (TO_CHAR(dept, 'FM09')||TO_CHAR(arrv, 'FM09'))
             , (tourName||'(2泊3日)01')
             , '3'
-            , (CURRENT_DATE + days_after)
+            , (date '2022-01-01' + days_after)
             , '2147483647'
             , TO_CHAR(dept, 'FM09')
             , TO_CHAR(arrv, 'FM09')
@@ -202,11 +202,11 @@ BEGIN
             , TOUR_ABS
           ) VALUES (
             tourCode
-            , CURRENT_DATE
+            , date '2022-01-01'
             , (TO_CHAR(dept, 'FM09')||TO_CHAR(arrv, 'FM09'))
             , (tourName||'(2泊3日)02')
             , '3'
-            , (CURRENT_DATE + days_after)
+            , (date '2022-01-01' + days_after)
             , '2147483647'
             , TO_CHAR(dept, 'FM09')
             , TO_CHAR(arrv, 'FM09')
@@ -233,11 +233,11 @@ BEGIN
             , TOUR_ABS
           ) VALUES (
             tourCode
-            , CURRENT_DATE
+            , date '2022-01-01'
             , (TO_CHAR(dept, 'FM09')||TO_CHAR(arrv, 'FM09'))
             , (tourName||'(3泊4日)01')
             , '4'
-            , (CURRENT_DATE + days_after)
+            , (date '2022-01-01' + days_after)
             , '2147483647'
             , TO_CHAR(dept, 'FM09')
             , TO_CHAR(arrv, 'FM09')
@@ -264,11 +264,11 @@ BEGIN
             , TOUR_ABS
           ) VALUES (
             tourCode
-            , CURRENT_DATE
+            , date '2022-01-01'
             , (TO_CHAR(dept, 'FM09')||TO_CHAR(arrv, 'FM09'))
             , (tourName||'(3泊4日)02')
             , '4'
-            , (CURRENT_DATE + days_after)
+            , (date '2022-01-01' + days_after)
             , '2147483647'
             , TO_CHAR(dept, 'FM09')
             , TO_CHAR(arrv, 'FM09')
@@ -295,11 +295,11 @@ BEGIN
             , TOUR_ABS
           ) VALUES (
             tourCode
-            , CURRENT_DATE
+            , date '2022-01-01'
             , (TO_CHAR(dept, 'FM09')||TO_CHAR(arrv, 'FM09'))
             , (tourName||'(4泊5日)01')
             , '5'
-            , (CURRENT_DATE + days_after)
+            , (date '2022-01-01' + days_after)
             , '2147483647'
             , TO_CHAR(dept, 'FM09')
             , TO_CHAR(arrv, 'FM09')
@@ -326,11 +326,11 @@ BEGIN
             , TOUR_ABS
           ) VALUES (
             tourCode
-            , CURRENT_DATE
+            , date '2022-01-01'
             , (TO_CHAR(dept, 'FM09')||TO_CHAR(arrv, 'FM09'))
             , (tourName||'(4泊5日)02')
             , '5'
-            , (CURRENT_DATE + days_after)
+            , (date '2022-01-01' + days_after)
             , '2147483647'
             , TO_CHAR(dept, 'FM09')
             , TO_CHAR(arrv, 'FM09')
@@ -357,11 +357,11 @@ BEGIN
             , TOUR_ABS
           ) VALUES (
             tourCode
-            , CURRENT_DATE
+            , date '2022-01-01'
             , (TO_CHAR(dept, 'FM09')||TO_CHAR(arrv, 'FM09'))
             , (tourName||'(5泊6日)')
             , '6'
-            , (CURRENT_DATE + i + 5)
+            , (date '2022-01-01' + i + 5)
             , '2147483647'
             , TO_CHAR(dept, 'FM09')
             , TO_CHAR(arrv, 'FM09')
@@ -388,11 +388,11 @@ BEGIN
             , TOUR_ABS
           ) VALUES (
             tourCode
-            , CURRENT_DATE
+            , date '2022-01-01'
             , (TO_CHAR(dept, 'FM09')||TO_CHAR(arrv, 'FM09'))
             , (tourName||'(6泊7日)')
             , '7'
-            , (CURRENT_DATE + days_after)
+            , (date '2022-01-01' + days_after)
             , '2147483647'
             , TO_CHAR(dept, 'FM09')
             , TO_CHAR(arrv, 'FM09')
@@ -421,11 +421,11 @@ DECLARE
   days_after INT;
   destination INT;
 BEGIN
-  days_after := 3;
+  days_after := 0;
   FOR destination IN 1..47 LOOP
-    FOR days_after IN 3..60 LOOP
+    FOR days_after IN 0..0 LOOP
       i := 1;
-      FOR i IN 1..5 LOOP
+      FOR i IN 1..1 LOOP
           SELECT
           TO_CHAR(nextval('TOUR_CODE_SEQ'), 'FM0000000999') INTO tourCode;
           --FROM
@@ -447,11 +447,11 @@ BEGIN
             , TOUR_ABS
           ) VALUES (
             tourCode
-            , CURRENT_DATE
+            , date '2022-01-01'
             , '0101'
             , (tourName||TO_CHAR(i, 'FM09'))
             , '1'
-            , (CURRENT_DATE) + days_after
+            , (date '2022-01-01') + days_after
             , '2147483647'
             , TO_CHAR(destination, 'FM09')
             , TO_CHAR(destination, 'FM09')
