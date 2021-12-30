@@ -32,7 +32,7 @@
       Default: /aws/service/ami-windows-latest/Windows_Server-2019-Japanese-Full-Base
     TestWinInstanceType:
       Type: String
-      Default: t3.micro
+      Default: t3.small
   # ------------------------
   # JMeterサーバ用パラメータ
   # ------------------------
@@ -44,7 +44,7 @@
       Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
     TestJmeterInstanceType:
       Type: String
-      Default: t3.micro
+      Default: t3.small
     TestJmeterKeyName:
       Type: "AWS::EC2::KeyPair::KeyName"
       Default: "key-performance-test"
@@ -205,7 +205,7 @@
           - DeviceName: /dev/sda1
             Ebs:
               VolumeType: gp2
-              VolumeSize: 30
+              VolumeSize: 40
               DeleteOnTermination: true
           # IAMロールをインスタンスにアタッチ
           IamInstanceProfile:
@@ -300,7 +300,7 @@
           - DeviceName: /dev/sda1
             Ebs:
               VolumeType: gp2
-              VolumeSize: 8
+              VolumeSize: 20
               DeleteOnTermination: true
           # IAMロールをインスタンスにアタッチ
           IamInstanceProfile:
